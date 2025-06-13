@@ -1,0 +1,104 @@
+{
+  "internalControlTests": [
+    {
+      "id": "CT-001",
+      "name": "User Access Review - Quarterly",
+      "category": "Access Controls"
+    },
+    {
+      "id": "CT-002",
+      "name": "Privileged Access Management",
+      "category": "Access Controls"
+    },
+    {
+      "id": "CT-003",
+      "name": "Data Backup Verification",
+      "category": "System Operations"
+    },
+    {
+      "id": "CT-004",
+      "name": "Change Management Process",
+      "category": "System Operations"
+    },
+    {
+      "id": "CT-005",
+      "name": "Incident Response Procedures",
+      "category": "Security"
+    },
+    {
+      "id": "CT-006",
+      "name": "Vulnerability Management",
+      "category": "Security"
+    },
+    {
+      "id": "CT-007",
+      "name": "Data Encryption Controls",
+      "category": "Data Protection"
+    },
+    {
+      "id": "CT-008",
+      "name": "Business Continuity Planning",
+      "category": "Availability"
+    },
+    {
+      "id": "CT-009",
+      "name": "Monitoring and Logging",
+      "category": "Monitoring"
+    },
+    {
+      "id": "CT-010",
+      "name": "Third-Party Risk Assessment",
+      "category": "Risk Management"
+    }
+  ],
+  "extractedCUECs": [
+    {
+      "id": "CUEC-001",
+      "text": "User entity should implement procedures to ensure that access to the system is restricted to authorized users and that access rights are reviewed on a periodic basis.",
+      "category": "Access Controls",
+      "mappedControl": "",
+      "comment": "",
+      "status": "unmapped"
+    },
+    {
+      "id": "CUEC-002",
+      "text": "User entity should establish procedures to ensure that data backups are performed regularly and that backup data can be restored in a timely manner.",
+      "category": "System Operations",
+      "mappedControl": "CT-003",
+      "comment": "Maps directly to our quarterly backup verification process",
+      "status": "mapped"
+    },
+    {
+      "id": "CUEC-003",
+      "text": "User entity should implement change management procedures to ensure that changes to the system are authorized, tested, and documented.",
+      "category": "System Operations",
+      "mappedControl": "CT-004",
+      "comment": "",
+      "status": "mapped"
+    },
+    {
+      "id": "CUEC-004",
+      "text": "User entity should establish incident response procedures to address security incidents in a timely manner.",
+      "category": "Security",
+      "mappedControl": "",
+      "comment": "",
+      "status": "unmapped"
+    },
+    {
+      "id": "CUEC-005",
+      "text": "User entity should implement monitoring procedures to detect unauthorized access attempts and system anomalies.",
+      "category": "Monitoring",
+      "mappedControl": "",
+      "comment": "",
+      "status": "unmapped"
+    },
+    {
+      "id": "CUEC-006",
+      "text": "User entity should ensure that sensitive data is encrypted both in transit and at rest using industry-standard encryption methods.",
+      "category": "Data Protection",
+      "mappedControl": "CT-007",
+      "comment": "Covers our encryption requirements",
+      "status": "mapped"
+    }
+  ]
+}

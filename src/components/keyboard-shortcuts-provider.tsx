@@ -15,41 +15,41 @@ export function KeyboardShortcutsProvider({ children }: KeyboardShortcutsProvide
   useHotkeys('g+d', () => {
     console.log('Navigating to dashboard')
     navigate({ to: '/dashboard' })
-  }, { preventDefault: true, timeout: 3000 })
+  }, { preventDefault: true })
   
   useHotkeys('g+w', () => {
     console.log('Navigating to workpapers')
     navigate({ to: '/workpapers' })
-  }, { preventDefault: true, timeout: 3000 })
+  }, { preventDefault: true })
   
   useHotkeys('g+e', () => {
     console.log('Hotkey g+e triggered - Navigating to evidence')
     navigate({ to: '/evidence' })
-  }, { preventDefault: true, timeout: 3000 })
+  }, { preventDefault: true })
   
   useHotkeys('g+c', () => {
     console.log('Hotkey g+c triggered - Navigating to controls')
     navigate({ to: '/controls' })
-  }, { preventDefault: true, timeout: 3000 })
+  }, { preventDefault: true })
   
   useHotkeys('g+x', () => {
     console.log('Hotkey g+x triggered - Navigating to exceptions')
     navigate({ to: '/exceptions' })
-  }, { preventDefault: true, timeout: 3000 })
+  }, { preventDefault: true })
   
   useHotkeys('g+m', () => {
     console.log('Hotkey g+m triggered - Navigating to cuec-mapping')
     navigate({ to: '/cuec-mapping' })
-  }, { preventDefault: true, timeout: 3000 })
+  }, { preventDefault: true })
 
   // Command palette shortcuts
   useHotkeys('meta+k,ctrl+k', () => setCommandOpen(true), { preventDefault: true })
   useHotkeys('meta+shift+p,ctrl+shift+p', () => setCommandOpen(true), { preventDefault: true })
 
   // Quick create shortcuts
-  useHotkeys('n+c', () => console.log('New Control Test'), { preventDefault: true, timeout: 3000 })
-  useHotkeys('n+w', () => console.log('New Workpaper'), { preventDefault: true, timeout: 3000 })
-  useHotkeys('n+e', () => console.log('Upload Evidence'), { preventDefault: true, timeout: 3000 })
+  useHotkeys('n+c', () => console.log('New Control Test'), { preventDefault: true })
+  useHotkeys('n+w', () => console.log('New Workpaper'), { preventDefault: true })
+  useHotkeys('n+e', () => console.log('Upload Evidence'), { preventDefault: true })
 
   // System shortcuts
   useHotkeys('meta+period,ctrl+period', () => navigate({ to: '/settings' }), { preventDefault: true })

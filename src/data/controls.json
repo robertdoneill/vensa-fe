@@ -1,0 +1,202 @@
+[
+  {
+    "id": "CT-001",
+    "name": "SOX-404-Revenue Recognition",
+    "objective": "Ensure revenue is recognized in accordance with ASC 606 and company policies",
+    "frequency": "quarterly",
+    "owner": {
+      "id": "USR-001",
+      "name": "Jane Smith",
+      "email": "jane.smith@company.com"
+    },
+    "criteria": "All revenue transactions over $10K must have proper documentation and approval",
+    "testType": "sox",
+    "createdAt": "2024-01-01T10:00:00Z",
+    "updatedAt": "2024-01-15T14:30:00Z",
+    "lastResult": {
+      "id": "CR-001",
+      "status": "pass",
+      "testDate": "2024-01-10T10:00:00Z",
+      "tester": {
+        "id": "USR-002",
+        "name": "Mike Johnson"
+      }
+    },
+    "commentCount": 3,
+    "evidenceCount": 5,
+    "status": "active"
+  },
+  {
+    "id": "CT-002",
+    "name": "UAR-Q4-Access Controls",
+    "objective": "Verify user access rights are appropriate and align with job responsibilities",
+    "frequency": "quarterly",
+    "owner": {
+      "id": "USR-002",
+      "name": "Mike Johnson",
+      "email": "mike.johnson@company.com"
+    },
+    "criteria": "100% of user access must be reviewed and approved by management",
+    "testType": "uar",
+    "createdAt": "2024-01-05T09:00:00Z",
+    "updatedAt": "2024-01-14T11:20:00Z",
+    "lastResult": {
+      "id": "CR-002",
+      "status": "exception",
+      "testDate": "2024-01-12T14:00:00Z",
+      "tester": {
+        "id": "USR-001",
+        "name": "Jane Smith"
+      }
+    },
+    "commentCount": 7,
+    "evidenceCount": 12,
+    "status": "active"
+  },
+  {
+    "id": "CT-003",
+    "name": "CM-101-Change Management",
+    "objective": "Ensure all system changes follow proper approval and testing procedures",
+    "frequency": "monthly",
+    "owner": {
+      "id": "USR-003",
+      "name": "Sarah Davis",
+      "email": "sarah.davis@company.com"
+    },
+    "criteria": "All changes must have documented approval, test plan, and rollback procedure",
+    "testType": "change_mgmt",
+    "createdAt": "2024-01-03T11:00:00Z",
+    "updatedAt": "2024-01-13T16:45:00Z",
+    "lastResult": null,
+    "commentCount": 0,
+    "evidenceCount": 0,
+    "status": "draft"
+  },
+  {
+    "id": "CT-004",
+    "name": "3WM-Q4-Three Way Match",
+    "objective": "Verify purchase orders, receipts, and invoices match before payment",
+    "frequency": "monthly",
+    "owner": {
+      "id": "USR-004",
+      "name": "Alex Chen",
+      "email": "alex.chen@company.com"
+    },
+    "criteria": "All discrepancies over $100 must be investigated and resolved",
+    "testType": "3wm",
+    "createdAt": "2024-01-02T13:00:00Z",
+    "updatedAt": "2024-01-11T10:15:00Z",
+    "lastResult": {
+      "id": "CR-003",
+      "status": "fail",
+      "testDate": "2024-01-11T09:00:00Z",
+      "tester": {
+        "id": "USR-003",
+        "name": "Sarah Davis"
+      }
+    },
+    "commentCount": 12,
+    "evidenceCount": 8,
+    "status": "active"
+  },
+  {
+    "id": "CT-005",
+    "name": "INV-Q4-Inventory Count",
+    "objective": "Validate physical inventory counts match recorded quantities",
+    "frequency": "quarterly",
+    "owner": {
+      "id": "USR-005",
+      "name": "John Doe",
+      "email": "john.doe@company.com"
+    },
+    "criteria": "Inventory variances over 2% must be investigated and documented",
+    "testType": "custom",
+    "createdAt": "2024-01-04T15:00:00Z",
+    "updatedAt": "2024-01-12T09:30:00Z",
+    "lastResult": {
+      "id": "CR-004",
+      "status": "pass",
+      "testDate": "2024-01-09T08:00:00Z",
+      "tester": {
+        "id": "USR-004",
+        "name": "Alex Chen"
+      }
+    },
+    "commentCount": 2,
+    "evidenceCount": 15,
+    "status": "active"
+  },
+  {
+    "id": "CT-006",
+    "name": "AP-Q4-Accounts Payable",
+    "objective": "Ensure accounts payable are properly recorded and approved",
+    "frequency": "quarterly",
+    "owner": {
+      "id": "USR-001",
+      "name": "Jane Smith",
+      "email": "jane.smith@company.com"
+    },
+    "criteria": "All invoices over $5K require dual approval before payment",
+    "testType": "sox",
+    "createdAt": "2024-01-01T12:00:00Z",
+    "updatedAt": "2024-01-10T16:00:00Z",
+    "lastResult": {
+      "id": "CR-005",
+      "status": "pass",
+      "testDate": "2024-01-08T11:00:00Z",
+      "tester": {
+        "id": "USR-002",
+        "name": "Mike Johnson"
+      }
+    },
+    "commentCount": 1,
+    "evidenceCount": 9,
+    "status": "active"
+  },
+  {
+    "id": "CT-007",
+    "name": "AR-Q4-Accounts Receivable",
+    "objective": "Verify accounts receivable aging and collection procedures",
+    "frequency": "quarterly",
+    "owner": {
+      "id": "USR-002",
+      "name": "Mike Johnson",
+      "email": "mike.johnson@company.com"
+    },
+    "criteria": "Aging reports must be reviewed monthly and bad debt provisions calculated",
+    "testType": "sox",
+    "createdAt": "2024-01-02T09:00:00Z",
+    "updatedAt": "2024-01-11T14:30:00Z",
+    "lastResult": {
+      "id": "CR-006",
+      "status": "exception",
+      "testDate": "2024-01-11T10:00:00Z",
+      "tester": {
+        "id": "USR-005",
+        "name": "John Doe"
+      }
+    },
+    "commentCount": 4,
+    "evidenceCount": 6,
+    "status": "active"
+  },
+  {
+    "id": "CT-008",
+    "name": "IT-SEC-Network Security",
+    "objective": "Validate network security controls and access management",
+    "frequency": "monthly",
+    "owner": {
+      "id": "USR-003",
+      "name": "Sarah Davis",
+      "email": "sarah.davis@company.com"
+    },
+    "criteria": "All network access must be authorized and regularly reviewed",
+    "testType": "custom",
+    "createdAt": "2024-01-03T14:00:00Z",
+    "updatedAt": "2024-01-13T11:15:00Z",
+    "lastResult": null,
+    "commentCount": 0,
+    "evidenceCount": 3,
+    "status": "draft"
+  }
+]
