@@ -1,7 +1,7 @@
 "use client"
 
 import { IconCirclePlusFilled, type Icon } from "@tabler/icons-react"
-import { Link } from "@tanstack/react-router"
+import { Link, useLocation } from "@tanstack/react-router"
 
 import { HotkeyTooltip } from "@/components/hotkey-tooltip"
 import {
@@ -22,6 +22,7 @@ export function NavMain({
     hotkey?: string[]
   }[]
 }) {
+  const location = useLocation()
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
@@ -37,27 +38,30 @@ export function NavMain({
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              {item.hotkey ? (
-                <HotkeyTooltip keys={item.hotkey}>
-                  <SidebarMenuButton asChild>
+          {items.map((item) => {
+            const isActive = location.pathname === item.url
+            return (
+              <SidebarMenuItem key={item.title}>
+                {item.hotkey ? (
+                  <HotkeyTooltip keys={item.hotkey}>
+                    <SidebarMenuButton asChild isActive={isActive}>
+                      <Link to={item.url}>
+                        {item.icon && <item.icon />}
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </HotkeyTooltip>
+                ) : (
+                  <SidebarMenuButton tooltip={item.title} asChild isActive={isActive}>
                     <Link to={item.url}>
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
-                </HotkeyTooltip>
-              ) : (
-                <SidebarMenuButton tooltip={item.title} asChild>
-                  <Link to={item.url}>
-                    {item.icon && <item.icon />}
-                    <span>{item.title}</span>
-                  </Link>
-                </SidebarMenuButton>
-              )}
-            </SidebarMenuItem>
-          ))}
+                )}
+              </SidebarMenuItem>
+            )
+          })}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
