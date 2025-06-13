@@ -12,7 +12,6 @@ import {
 } from "@tanstack/react-table"
 import {
   IconFile,
-  IconFileTypeDocx,
   IconFileTypePdf,
   IconFileTypeXls,
   IconMail,

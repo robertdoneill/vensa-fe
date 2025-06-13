@@ -1,0 +1,193 @@
+[
+  {
+    "id": "EXC-001",
+    "summary": "Missing approval for purchase order #12345",
+    "controlTest": "3WM-Q4-Three Way Match",
+    "severity": "High",
+    "status": "Open",
+    "assignedTo": "Jane Smith",
+    "dateIdentified": "Dec 10, 2024",
+    "description": "Purchase order #12345 for $45,000 was processed without required manager approval. This violates the procurement policy requiring approval for all purchases over $10,000.",
+    "linkedEvidence": [
+      { "name": "PO_12345.pdf", "type": "PDF" },
+      { "name": "Approval_Matrix.xlsx", "type": "Excel" }
+    ],
+    "rootCause": "The system allowed the purchase order to be processed because the approval workflow was bypassed using an emergency override code.",
+    "comments": [
+      {
+        "id": 1,
+        "user": "Mike Johnson",
+        "text": "I've reviewed the transaction and confirmed the missing approval. @Jane can you investigate why the override was used?",
+        "timestamp": "Dec 10, 2024 2:30 PM"
+      },
+      {
+        "id": 2,
+        "user": "Jane Smith",
+        "text": "Looking into it now. Will update by EOD.",
+        "timestamp": "Dec 10, 2024 3:15 PM"
+      }
+    ],
+    "auditTrail": [
+      { "action": "Exception created", "user": "System", "date": "Dec 10, 2024 10:00 AM" },
+      { "action": "Assigned to Jane Smith", "user": "Mike Johnson", "date": "Dec 10, 2024 10:15 AM" }
+    ]
+  },
+  {
+    "id": "EXC-002",
+    "summary": "User access not revoked for terminated employee",
+    "controlTest": "UAR-Q4-Access Controls",
+    "severity": "High",
+    "status": "In Progress",
+    "assignedTo": "Mike Johnson",
+    "dateIdentified": "Dec 9, 2024",
+    "description": "Employee John Doe (ID: 45678) was terminated on Nov 30, 2024, but still had active access to financial systems as of Dec 9, 2024. This violates the access control policy requiring immediate revocation upon termination.",
+    "linkedEvidence": [
+      { "name": "User_Access_Report.xlsx", "type": "Excel" },
+      { "name": "Termination_Record.pdf", "type": "PDF" }
+    ],
+    "rootCause": "The termination notification was sent to IT, but the ticket was not processed due to a backlog during the holiday period.",
+    "comments": [
+      {
+        "id": 1,
+        "user": "Mike Johnson",
+        "text": "I've contacted IT to revoke access immediately. Will follow up on process improvement.",
+        "timestamp": "Dec 9, 2024 1:45 PM"
+      }
+    ],
+    "auditTrail": [
+      { "action": "Exception created", "user": "System", "date": "Dec 9, 2024 11:30 AM" },
+      { "action": "Assigned to Mike Johnson", "user": "Sarah Davis", "date": "Dec 9, 2024 11:45 AM" },
+      { "action": "Status changed to In Progress", "user": "Mike Johnson", "date": "Dec 9, 2024 1:45 PM" }
+    ]
+  },
+  {
+    "id": "EXC-003",
+    "summary": "Revenue recognized in incorrect period",
+    "controlTest": "SOX-404-Revenue Recognition",
+    "severity": "Medium",
+    "status": "Resolved",
+    "assignedTo": "Sarah Davis",
+    "dateIdentified": "Dec 8, 2024",
+    "description": "Contract #789 for $125,000 was recognized in December 2024, but performance obligations were not satisfied until January 2025. This violates ASC 606 revenue recognition criteria.",
+    "linkedEvidence": [
+      { "name": "Contract_789.pdf", "type": "PDF" },
+      { "name": "Revenue_Journal_Entry.xlsx", "type": "Excel" }
+    ],
+    "rootCause": "The contract completion date was incorrectly entered in the system as December 28, 2024 instead of January 15, 2025.",
+    "comments": [
+      {
+        "id": 1,
+        "user": "Sarah Davis",
+        "text": "I've reviewed the contract and confirmed the error. Working with accounting to correct the entry.",
+        "timestamp": "Dec 8, 2024 3:30 PM"
+      },
+      {
+        "id": 2,
+        "user": "Alex Chen",
+        "text": "Accounting has processed the correction. Journal entry #45678 reverses the revenue and will recognize in January.",
+        "timestamp": "Dec 9, 2024 10:15 AM"
+      },
+      {
+        "id": 3,
+        "user": "Sarah Davis",
+        "text": "Verified the correction. This exception can be closed.",
+        "timestamp": "Dec 9, 2024 11:30 AM"
+      }
+    ],
+    "auditTrail": [
+      { "action": "Exception created", "user": "System", "date": "Dec 8, 2024 2:15 PM" },
+      { "action": "Assigned to Sarah Davis", "user": "Jane Smith", "date": "Dec 8, 2024 2:30 PM" },
+      { "action": "Status changed to In Progress", "user": "Sarah Davis", "date": "Dec 8, 2024 3:30 PM" },
+      { "action": "Status changed to Resolved", "user": "Sarah Davis", "date": "Dec 9, 2024 11:30 AM" }
+    ]
+  },
+  {
+    "id": "EXC-004",
+    "summary": "Segregation of duties conflict in payment approval",
+    "controlTest": "AP-Q4-Accounts Payable",
+    "severity": "Medium",
+    "status": "Escalated",
+    "assignedTo": "John Doe",
+    "dateIdentified": "Dec 7, 2024",
+    "description": "User ID 789 (Robert Johnson) has both payment creation and approval rights in the AP system. This violates segregation of duties controls requiring separate individuals for these functions.",
+    "linkedEvidence": [
+      { "name": "User_Roles_Report.xlsx", "type": "Excel" },
+      { "name": "Payment_Approval_Log.pdf", "type": "PDF" }
+    ],
+    "rootCause": "Temporary access was granted during year-end processing but was not revoked after the emergency period ended.",
+    "comments": [
+      {
+        "id": 1,
+        "user": "John Doe",
+        "text": "This appears to be a significant control deficiency. Need to escalate to the CFO.",
+        "timestamp": "Dec 7, 2024 4:15 PM"
+      },
+      {
+        "id": 2,
+        "user": "Jane Smith",
+        "text": "Agreed. I've scheduled a meeting with the CFO for tomorrow to discuss.",
+        "timestamp": "Dec 7, 2024 4:45 PM"
+      }
+    ],
+    "auditTrail": [
+      { "action": "Exception created", "user": "System", "date": "Dec 7, 2024 3:00 PM" },
+      { "action": "Assigned to John Doe", "user": "Mike Johnson", "date": "Dec 7, 2024 3:15 PM" },
+      { "action": "Status changed to Escalated", "user": "John Doe", "date": "Dec 7, 2024 4:15 PM" }
+    ]
+  },
+  {
+    "id": "EXC-005",
+    "summary": "Incomplete change management documentation",
+    "controlTest": "CM-101-Change Management",
+    "severity": "Low",
+    "status": "Open",
+    "assignedTo": "Alex Chen",
+    "dateIdentified": "Dec 6, 2024",
+    "description": "System change #456 was implemented without complete testing documentation. The change management policy requires test plans and results for all system changes.",
+    "linkedEvidence": [
+      { "name": "Change_Request_456.pdf", "type": "PDF" },
+      { "name": "Implementation_Log.xlsx", "type": "Excel" }
+    ],
+    "rootCause": "The change was implemented during an emergency fix, and documentation was not completed afterward.",
+    "comments": [
+      {
+        "id": 1,
+        "user": "Alex Chen",
+        "text": "I'll follow up with the development team to get the missing documentation.",
+        "timestamp": "Dec 6, 2024 2:30 PM"
+      }
+    ],
+    "auditTrail": [
+      { "action": "Exception created", "user": "System", "date": "Dec 6, 2024 1:15 PM" },
+      { "action": "Assigned to Alex Chen", "user": "Sarah Davis", "date": "Dec 6, 2024 1:30 PM" }
+    ]
+  },
+  {
+    "id": "EXC-006",
+    "summary": "Duplicate invoice payment detected",
+    "controlTest": "AP-Q4-Accounts Payable",
+    "severity": "High",
+    "status": "In Progress",
+    "assignedTo": "Jane Smith",
+    "dateIdentified": "Dec 5, 2024",
+    "description": "Invoice #98765 from Vendor ABC Corp was paid twice, resulting in an overpayment of $23,500. The duplicate payment control failed to prevent the second payment.",
+    "linkedEvidence": [
+      { "name": "Invoice_98765.pdf", "type": "PDF" },
+      { "name": "Payment_Records.xlsx", "type": "Excel" }
+    ],
+    "rootCause": "The invoice was entered into the system with slightly different vendor names, bypassing the duplicate detection algorithm.",
+    "comments": [
+      {
+        "id": 1,
+        "user": "Jane Smith",
+        "text": "Contacted the vendor to arrange for a credit memo. Will update the duplicate detection logic.",
+        "timestamp": "Dec 5, 2024 4:00 PM"
+      }
+    ],
+    "auditTrail": [
+      { "action": "Exception created", "user": "System", "date": "Dec 5, 2024 2:45 PM" },
+      { "action": "Assigned to Jane Smith", "user": "Mike Johnson", "date": "Dec 5, 2024 3:00 PM" },
+      { "action": "Status changed to In Progress", "user": "Jane Smith", "date": "Dec 5, 2024 4:00 PM" }
+    ]
+  }
+]

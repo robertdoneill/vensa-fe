@@ -1,4 +1,3 @@
-import * as React from "react"
 import { IconSearch } from "@tabler/icons-react"
 
 import { Input } from "@/components/ui/input"

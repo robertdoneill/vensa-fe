@@ -1,107 +1,158 @@
+import * as React from "react"
 import { createFileRoute } from '@tanstack/react-router'
-import { AppLayout } from "@/components/app-layout"
-import { Badge } from "@/components/ui/badge"
+import { IconPlus } from "@tabler/icons-react"
+
+import { PageLayout } from "@/components/page-layout"
+import { PageHeader } from "@/components/page-header"
+import { FilterBar } from "@/components/filter-bar"
+import { WorkpapersDataTable } from "@/components/workpapers-data-table"
+import { WorkpaperDetailDrawer } from "@/components/workpaper-detail-drawer"
 import { Button } from "@/components/ui/button"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { IconEye, IconEdit, IconDownload } from "@tabler/icons-react"
 
-import workpapersData from "@/data/workpapers-data.json"
+import workpapersData from "@/data/workpapers.json"
 
-export const Route = createFileRoute('/workpapers')({
-  component: Workpapers,
-})
-
-function getStatusVariant(status: string): "default" | "secondary" | "destructive" | "outline" {
-  switch (status) {
-    case "Done":
-      return "default"
-    case "In Process":
-      return "secondary"
-    default:
-      return "outline"
-  }
+interface Workpaper {
+  id: string
+  title: string
+  controlTest: string
+  status: string
+  lastModified: string
+  evidenceCount: number
+  createdBy: string
+  description: string
+  criteria: string
+  objective: string
+  aiFindings: Array<{
+    step: string
+    outcome: string
+    status: string
+  }>
+  comments: string
+  auditTrail: Array<{
+    action: string
+    user: string
+    date: string
+  }>
 }
 
-function Workpapers() {
+export const Route = createFileRoute('/workpapers')({
+  component: WorkpapersPage,
+})
+
+function WorkpapersPage() {
+  const [selectedWorkpaper, setSelectedWorkpaper] = React.useState<Workpaper | null>(null)
+  const [isDetailOpen, setIsDetailOpen] = React.useState(false)
+  const [filteredData, setFilteredData] = React.useState(workpapersData)
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const [statusFilter, setStatusFilter] = React.useState("all")
+  const [testTypeFilter, setTestTypeFilter] = React.useState("all")
+  const [createdByFilter, setCreatedByFilter] = React.useState("all")
+
+  const handleRowClick = (workpaper: Workpaper) => {
+    setSelectedWorkpaper(workpaper)
+    setIsDetailOpen(true)
+  }
+
+  React.useEffect(() => {
+    let filtered = workpapersData
+
+    if (searchQuery) {
+      filtered = filtered.filter(
+        (workpaper) =>
+          workpaper.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          workpaper.controlTest.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    }
+
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((workpaper) => workpaper.status === statusFilter)
+    }
+
+    if (testTypeFilter !== "all") {
+      filtered = filtered.filter((workpaper) =>
+        workpaper.controlTest.toLowerCase().includes(testTypeFilter.toLowerCase())
+      )
+    }
+
+    if (createdByFilter !== "all") {
+      filtered = filtered.filter((workpaper) => workpaper.createdBy === createdByFilter)
+    }
+
+    setFilteredData(filtered)
+  }, [searchQuery, statusFilter, testTypeFilter, createdByFilter])
+
+  const filterConfigs = [
+    {
+      id: "status",
+      placeholder: "Status",
+      value: statusFilter,
+      onChange: setStatusFilter,
+      options: [
+        { value: "all", label: "All Statuses" },
+        { value: "Draft", label: "Draft" },
+        { value: "In Review", label: "In Review" },
+        { value: "Finalized", label: "Finalized" },
+      ],
+    },
+    {
+      id: "testType",
+      placeholder: "Test Type",
+      value: testTypeFilter,
+      onChange: setTestTypeFilter,
+      options: [
+        { value: "all", label: "All Types" },
+        { value: "uar", label: "UAR" },
+        { value: "3wm", label: "3WM" },
+        { value: "sox", label: "SOX" },
+        { value: "cm", label: "Change Mgmt" },
+      ],
+    },
+    {
+      id: "createdBy",
+      placeholder: "Created By",
+      value: createdByFilter,
+      onChange: setCreatedByFilter,
+      options: [
+        { value: "all", label: "All Users" },
+        { value: "Jane Smith", label: "Jane Smith" },
+        { value: "Mike Johnson", label: "Mike Johnson" },
+        { value: "Sarah Davis", label: "Sarah Davis" },
+        { value: "Alex Chen", label: "Alex Chen" },
+        { value: "Lisa Wong", label: "Lisa Wong" },
+      ],
+    },
+  ]
+
   return (
-    <AppLayout>
-      <div className="@container/main flex flex-1 flex-col gap-2">
-      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-        <div className="px-4 lg:px-6">
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold">Workpaper Management</h3>
-            <p className="text-sm text-muted-foreground">
-              Track and manage audit workpaper completion status
-            </p>
-          </div>
-          
-          <div className="overflow-hidden rounded-lg border">
-            <Table>
-              <TableHeader className="bg-muted">
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Header</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Target</TableHead>
-                  <TableHead>Limit</TableHead>
-                  <TableHead>Reviewer</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {workpapersData.map((workpaper) => (
-                  <TableRow key={workpaper.id}>
-                    <TableCell className="font-medium">{workpaper.id}</TableCell>
-                    <TableCell>
-                      <div className="max-w-xs">
-                        <div className="truncate font-medium">{workpaper.header}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="text-xs">
-                        {workpaper.type}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusVariant(workpaper.status)} className="text-xs">
-                        {workpaper.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-center">{workpaper.target}</TableCell>
-                    <TableCell className="text-center">{workpaper.limit}</TableCell>
-                    <TableCell>{workpaper.reviewer}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="sm">
-                          <IconEye className="size-4" />
-                          <span className="sr-only">View</span>
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <IconEdit className="size-4" />
-                          <span className="sr-only">Edit</span>
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <IconDownload className="size-4" />
-                          <span className="sr-only">Download</span>
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
+    <PageLayout title="Workpapers">
+      <PageHeader
+        description="Review and finalize control test documentation"
+        actions={
+          <Button>
+            <IconPlus className="h-4 w-4 mr-2" />
+            Generate New Workpaper
+          </Button>
+        }
+      />
+
+      <div className="px-4 lg:px-6">
+        <FilterBar
+          searchPlaceholder="Search workpapers..."
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          filters={filterConfigs}
+        />
       </div>
+
+      <div className="px-4 lg:px-6">
+        <WorkpapersDataTable data={filteredData} onRowClick={handleRowClick} />
       </div>
-    </AppLayout>
+
+      <WorkpaperDetailDrawer
+        workpaper={selectedWorkpaper}
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+      />
+    </PageLayout>
   )
 }

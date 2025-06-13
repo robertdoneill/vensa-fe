@@ -1,0 +1,169 @@
+[
+  {
+    "id": "WP-001",
+    "title": "Revenue Recognition Testing - Q4 2024",
+    "controlTest": "SOX-404-Revenue Recognition",
+    "status": "Finalized",
+    "lastModified": "Dec 10, 2024",
+    "evidenceCount": 8,
+    "createdBy": "Jane Smith",
+    "description": "Testing of revenue recognition controls for Q4 2024 including cut-off procedures and contract review.",
+    "criteria": "Revenue is recognized when performance obligations are satisfied and control is transferred to the customer.",
+    "objective": "Ensure revenue recognition complies with ASC 606 and internal policies.",
+    "aiFindings": [
+      {
+        "step": "Sample Selection",
+        "outcome": "Selected 25 revenue transactions totaling $2.4M representing 15% of Q4 revenue",
+        "status": "Complete"
+      },
+      {
+        "step": "Contract Review",
+        "outcome": "All contracts contain clear performance obligations and delivery terms",
+        "status": "Complete"
+      },
+      {
+        "step": "Cut-off Testing",
+        "outcome": "No exceptions identified in revenue cut-off procedures",
+        "status": "Complete"
+      }
+    ],
+    "comments": "Testing completed successfully with no exceptions noted.",
+    "auditTrail": [
+      { "action": "Finalized workpaper", "user": "Jane Smith", "date": "Dec 10, 2024 2:30 PM" },
+      { "action": "Added final comments", "user": "Jane Smith", "date": "Dec 10, 2024 2:15 PM" },
+      { "action": "Reviewed AI findings", "user": "Mike Johnson", "date": "Dec 10, 2024 10:00 AM" }
+    ]
+  },
+  {
+    "id": "WP-002",
+    "title": "Access Controls Review - UAR Q4",
+    "controlTest": "UAR-Q4-Access Controls",
+    "status": "In Review",
+    "lastModified": "Dec 9, 2024",
+    "evidenceCount": 12,
+    "createdBy": "Mike Johnson",
+    "description": "User access review for Q4 2024 including privileged access and segregation of duties testing.",
+    "criteria": "Users should have appropriate access based on job responsibilities with proper segregation of duties.",
+    "objective": "Validate that user access is appropriate and properly authorized.",
+    "aiFindings": [
+      {
+        "step": "User Access Analysis",
+        "outcome": "Analyzed 1,247 user accounts across 15 systems",
+        "status": "Complete"
+      },
+      {
+        "step": "Privileged Access Review",
+        "outcome": "Identified 3 users with excessive privileges requiring review",
+        "status": "Exception"
+      },
+      {
+        "step": "Segregation of Duties",
+        "outcome": "Testing in progress - 80% complete",
+        "status": "In Progress"
+      }
+    ],
+    "comments": "Need to follow up on privileged access exceptions with IT team.",
+    "auditTrail": [
+      { "action": "Updated comments", "user": "Mike Johnson", "date": "Dec 9, 2024 4:45 PM" },
+      { "action": "Reviewed findings", "user": "Sarah Davis", "date": "Dec 9, 2024 11:30 AM" },
+      { "action": "Generated AI analysis", "user": "System", "date": "Dec 8, 2024 3:00 PM" }
+    ]
+  },
+  {
+    "id": "WP-003",
+    "title": "Change Management Controls",
+    "controlTest": "CM-101-Change Management",
+    "status": "Draft",
+    "lastModified": "Dec 8, 2024",
+    "evidenceCount": 5,
+    "createdBy": "Sarah Davis",
+    "description": "Testing of IT change management controls including approval workflows and documentation.",
+    "criteria": "All IT changes must be properly approved, tested, and documented before implementation.",
+    "objective": "Ensure change management process is operating effectively.",
+    "aiFindings": [
+      {
+        "step": "Change Request Review",
+        "outcome": "Reviewed 45 change requests from Q4 2024",
+        "status": "Complete"
+      },
+      {
+        "step": "Approval Documentation",
+        "outcome": "2 changes missing proper approval documentation",
+        "status": "Exception"
+      },
+      {
+        "step": "Testing Evidence",
+        "outcome": "Analysis in progress",
+        "status": "In Progress"
+      }
+    ],
+    "comments": "Initial review complete, need to gather additional evidence for exceptions.",
+    "auditTrail": [
+      { "action": "Added initial findings", "user": "Sarah Davis", "date": "Dec 8, 2024 1:20 PM" },
+      { "action": "Created workpaper", "user": "Sarah Davis", "date": "Dec 7, 2024 9:00 AM" }
+    ]
+  },
+  {
+    "id": "WP-004",
+    "title": "Three-Way Match Testing",
+    "controlTest": "3WM-Q4-Three Way Match",
+    "status": "In Review",
+    "lastModified": "Dec 7, 2024",
+    "evidenceCount": 15,
+    "createdBy": "Alex Chen",
+    "description": "Testing of three-way match controls for purchase orders, receipts, and invoices.",
+    "criteria": "All purchases must have matching PO, receipt, and invoice before payment approval.",
+    "objective": "Validate effectiveness of three-way match controls in the procure-to-pay process.",
+    "aiFindings": [
+      {
+        "step": "Sample Selection",
+        "outcome": "Selected 50 transactions totaling $1.8M for testing",
+        "status": "Complete"
+      },
+      {
+        "step": "Match Analysis",
+        "outcome": "47 transactions properly matched, 3 exceptions identified",
+        "status": "Complete"
+      },
+      {
+        "step": "Exception Analysis",
+        "outcome": "All exceptions have valid business justification",
+        "status": "Complete"
+      }
+    ],
+    "comments": "Testing substantially complete, pending final review.",
+    "auditTrail": [
+      { "action": "Completed exception analysis", "user": "Alex Chen", "date": "Dec 7, 2024 3:15 PM" },
+      { "action": "Updated findings", "user": "Alex Chen", "date": "Dec 6, 2024 2:00 PM" },
+      { "action": "Started testing", "user": "Alex Chen", "date": "Dec 5, 2024 9:30 AM" }
+    ]
+  },
+  {
+    "id": "WP-005",
+    "title": "Financial Close Controls",
+    "controlTest": "FC-Q4-Financial Close",
+    "status": "Draft",
+    "lastModified": "Dec 6, 2024",
+    "evidenceCount": 3,
+    "createdBy": "Lisa Wong",
+    "description": "Testing of financial close controls including journal entry reviews and account reconciliations.",
+    "criteria": "All journal entries must be properly approved and account reconciliations completed timely.",
+    "objective": "Ensure financial close process operates effectively and produces accurate financial statements.",
+    "aiFindings": [
+      {
+        "step": "Journal Entry Review",
+        "outcome": "Initial sample of 30 journal entries selected",
+        "status": "In Progress"
+      },
+      {
+        "step": "Reconciliation Testing",
+        "outcome": "Pending sample selection",
+        "status": "Pending"
+      }
+    ],
+    "comments": "Just started - initial sample selection in progress.",
+    "auditTrail": [
+      { "action": "Created workpaper", "user": "Lisa Wong", "date": "Dec 6, 2024 10:15 AM" }
+    ]
+  }
+]
