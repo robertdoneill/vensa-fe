@@ -1,5 +1,3 @@
-"use client"
-
 import * as React from "react"
 import { useNavigate } from "@tanstack/react-router"
 import { useHotkeys } from "react-hotkeys-hook"
@@ -13,13 +11,36 @@ export function KeyboardShortcutsProvider({ children }: KeyboardShortcutsProvide
   const navigate = useNavigate()
   const [commandOpen, setCommandOpen] = React.useState(false)
 
-  // Navigation shortcuts
-  useHotkeys('g+d', () => navigate({ to: '/dashboard' }), { preventDefault: true })
-  useHotkeys('g+w', () => navigate({ to: '/workpapers' }), { preventDefault: true })
-  useHotkeys('g+e', () => navigate({ to: '/evidence' }), { preventDefault: true })
-  useHotkeys('g+c', () => navigate({ to: '/controls' }), { preventDefault: true })
-  useHotkeys('g+x', () => navigate({ to: '/exceptions' }), { preventDefault: true })
-  useHotkeys('g+m', () => navigate({ to: '/cuec-mapping' }), { preventDefault: true })
+  // Navigation shortcuts - using callback to ensure navigation happens
+  useHotkeys('g+d', () => {
+    console.log('Navigating to dashboard')
+    navigate({ to: '/dashboard' })
+  }, { preventDefault: true })
+  
+  useHotkeys('g+w', () => {
+    console.log('Navigating to workpapers')
+    navigate({ to: '/workpapers' })
+  }, { preventDefault: true })
+  
+  useHotkeys('g+e', () => {
+    console.log('Navigating to evidence')
+    navigate({ to: '/evidence' })
+  }, { preventDefault: true })
+  
+  useHotkeys('g+c', () => {
+    console.log('Navigating to controls')
+    navigate({ to: '/controls' })
+  }, { preventDefault: true })
+  
+  useHotkeys('g+x', () => {
+    console.log('Navigating to exceptions')
+    navigate({ to: '/exceptions' })
+  }, { preventDefault: true })
+  
+  useHotkeys('g+m', () => {
+    console.log('Navigating to cuec-mapping')
+    navigate({ to: '/cuec-mapping' })
+  }, { preventDefault: true })
 
   // Command palette shortcuts
   useHotkeys('meta+k,ctrl+k', () => setCommandOpen(true), { preventDefault: true })

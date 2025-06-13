@@ -1,0 +1,125 @@
+[
+  {
+    "id": "EV-001",
+    "fileName": "Q4_Revenue_Report.xlsx",
+    "fileType": "excel",
+    "uploader": {
+      "id": "USR-001",
+      "name": "Jane Smith",
+      "email": "jane.smith@company.com"
+    },
+    "uploadedDate": "2024-12-15T10:30:00Z",
+    "status": "parsed",
+    "fileSize": "2.4 MB",
+    "tags": ["IPE", "Q4-2024", "Revenue"],
+    "linkedControlTests": [
+      {
+        "id": "CT-001",
+        "name": "SOX-404-Revenue Recognition",
+        "type": "SOX"
+      }
+    ],
+    "parsedEvidence": {
+      "id": "PE-001",
+      "hasExtractedTables": true,
+      "tableCount": 3
+    }
+  },
+  {
+    "id": "EV-002",
+    "fileName": "Access_Control_Policy.pdf",
+    "fileType": "pdf",
+    "uploader": {
+      "id": "USR-002",
+      "name": "Mike Johnson",
+      "email": "mike.johnson@company.com"
+    },
+    "uploadedDate": "2024-12-14T14:22:00Z",
+    "status": "parsed",
+    "fileSize": "1.8 MB",
+    "tags": ["Policy", "Access Control"],
+    "linkedControlTests": [
+      {
+        "id": "CT-002",
+        "name": "UAR-Q4-Access Controls",
+        "type": "UAR"
+      }
+    ],
+    "parsedEvidence": {
+      "id": "PE-002",
+      "hasExtractedTables": false,
+      "extractedText": "Access control policy document..."
+    }
+  },
+  {
+    "id": "EV-003",
+    "fileName": "Email_Approval_Chain.msg",
+    "fileType": "email",
+    "uploader": {
+      "id": "USR-003",
+      "name": "Sarah Davis",
+      "email": "sarah.davis@company.com"
+    },
+    "uploadedDate": "2024-12-13T09:15:00Z",
+    "status": "pending",
+    "fileSize": "156 KB",
+    "tags": [],
+    "linkedControlTests": []
+  },
+  {
+    "id": "EV-004",
+    "fileName": "System_Screenshot.png",
+    "fileType": "image",
+    "uploader": {
+      "id": "USR-004",
+      "name": "Alex Chen",
+      "email": "alex.chen@company.com"
+    },
+    "uploadedDate": "2024-12-12T16:45:00Z",
+    "status": "processing",
+    "fileSize": "892 KB",
+    "tags": ["Screenshot", "System Evidence"],
+    "linkedControlTests": []
+  },
+  {
+    "id": "EV-005",
+    "fileName": "Three_Way_Match_Data.xlsx",
+    "fileType": "excel",
+    "uploader": {
+      "id": "USR-004",
+      "name": "Alex Chen",
+      "email": "alex.chen@company.com"
+    },
+    "uploadedDate": "2024-12-11T11:30:00Z",
+    "status": "parsed",
+    "fileSize": "3.2 MB",
+    "tags": ["3WM", "Q4-2024"],
+    "linkedControlTests": [
+      {
+        "id": "CT-003",
+        "name": "3WM-Q4-Three Way Match",
+        "type": "3WM"
+      }
+    ],
+    "parsedEvidence": {
+      "id": "PE-003",
+      "hasExtractedTables": true,
+      "tableCount": 5
+    }
+  },
+  {
+    "id": "EV-006",
+    "fileName": "Change_Request_Form.pdf",
+    "fileType": "pdf",
+    "uploader": {
+      "id": "USR-003",
+      "name": "Sarah Davis",
+      "email": "sarah.davis@company.com"
+    },
+    "uploadedDate": "2024-12-10T15:20:00Z",
+    "status": "error",
+    "fileSize": "456 KB",
+    "tags": ["Change Management"],
+    "linkedControlTests": []
+  }
+]

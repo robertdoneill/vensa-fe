@@ -5,9 +5,10 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 
 interface AppLayoutProps {
   children: React.ReactNode
+  title?: string
 }
 
-export function AppLayout({ children }: AppLayoutProps) {
+export function AppLayout({ children, title = "Dashboard" }: AppLayoutProps) {
   return (
     <SidebarProvider
       style={
@@ -19,7 +20,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     >
       <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader />
+        <SiteHeader title={title} />
         <div className="flex flex-1 flex-col">
           {children}
         </div>
