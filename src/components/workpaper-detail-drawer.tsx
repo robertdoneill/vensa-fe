@@ -10,7 +10,9 @@ import {
   IconActivity,
   IconFileText,
   IconTarget,
+  IconReportAnalytics,
 } from "@tabler/icons-react"
+import { useNavigate } from '@tanstack/react-router'
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -106,7 +108,14 @@ const getFindingStatusBadge = (status: string) => {
 }
 
 export function WorkpaperDetailDrawer({ workpaper, isOpen, onClose }: WorkpaperDetailDrawerProps) {
+  const navigate = useNavigate()
+  
   if (!workpaper) return null
+
+  const handleViewReport = () => {
+    navigate({ to: `/workpapers/reports/${workpaper.id}` })
+    onClose()
+  }
 
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
@@ -250,6 +259,10 @@ export function WorkpaperDetailDrawer({ workpaper, isOpen, onClose }: WorkpaperD
               </Button>
               <Button variant="outline">
                 Export
+              </Button>
+              <Button variant="outline" onClick={handleViewReport}>
+                <IconReportAnalytics className="h-4 w-4 mr-2" />
+                View Report
               </Button>
               <Button>
                 Edit Workpaper

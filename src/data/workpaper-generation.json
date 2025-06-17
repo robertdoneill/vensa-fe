@@ -1,0 +1,85 @@
+{
+  "availableControlTests": [
+    {
+      "id": "CT-001",
+      "name": "UAR-Q4-Access Controls Review",
+      "testType": "uar",
+      "objective": "Ensure appropriate access rights across financial systems",
+      "lastResult": {
+        "status": "exception",
+        "testDate": "2024-01-10"
+      }
+    },
+    {
+      "id": "CT-002",
+      "name": "SOX-404-Revenue Recognition",
+      "testType": "sox",
+      "objective": "Verify revenue is recognized per ASC 606",
+      "lastResult": {
+        "status": "pass",
+        "testDate": "2024-01-08"
+      }
+    },
+    {
+      "id": "CT-003",
+      "name": "3WM-Q4-Three Way Match",
+      "testType": "3wm",
+      "objective": "Verify purchase orders, receipts, and invoices match before payment",
+      "lastResult": {
+        "status": "pass",
+        "testDate": "2024-01-12"
+      }
+    },
+    {
+      "id": "CT-004",
+      "name": "CM-101-Change Management",
+      "testType": "change_mgmt",
+      "objective": "Ensure all system changes follow proper approval and testing procedures",
+      "lastResult": {
+        "status": "fail",
+        "testDate": "2024-01-11"
+      }
+    }
+  ],
+  "reviewers": [
+    {
+      "id": "USR-001",
+      "name": "Jane Smith",
+      "role": "Senior Auditor"
+    },
+    {
+      "id": "USR-002",
+      "name": "Mike Johnson",
+      "role": "Audit Manager"
+    },
+    {
+      "id": "USR-003",
+      "name": "Sarah Davis",
+      "role": "Director"
+    },
+    {
+      "id": "USR-004",
+      "name": "Alex Chen",
+      "role": "Partner"
+    }
+  ],
+  "defaultSections": [
+    {
+      "id": "1",
+      "sectionType": "summary",
+      "title": "Executive Summary",
+      "content": "",
+      "orderIndex": 0
+    },
+    {
+      "id": "2",
+      "sectionType": "test_step",
+      "title": "User Access Listing Review",
+      "content": "",
+      "testPerformed": "Obtained complete user access listing from all financial systems and compared against authorized user list maintained by HR.",
+      "resultSummary": "Reviewed 1,247 user accounts across 15 systems. Identified 3 users with access that requires management review.",
+      "outcome": "exception",
+      "orderIndex": 1
+    }
+  ]
+}

@@ -4,6 +4,7 @@ import { ChartAreaInteractive } from "@/components/chart-area-interactive"
 import { AuditDataTable } from "@/components/audit-data-table"
 import { SectionCards } from "@/components/section-cards"
 import { QuickActions } from "@/components/quick-actions"
+import { ApiTestCard } from "@/components/api-test-card"
 
 // import auditData from "@/data/audit-data.json"
 
@@ -109,6 +110,9 @@ function Dashboard() {
         <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
           <SectionCards metrics={auditData.metrics} />
           <QuickActions />
+          <div className="px-4 lg:px-6">
+            <ApiTestCard />
+          </div>
           <div className="px-4 lg:px-6">
             <ChartAreaInteractive data={auditData.activityTimeline} />
           </div>

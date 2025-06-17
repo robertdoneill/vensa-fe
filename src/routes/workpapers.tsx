@@ -1,5 +1,5 @@
 import * as React from "react"
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { IconPlus } from "@tabler/icons-react"
 
 import { PageLayout } from "@/components/page-layout"
@@ -40,6 +40,7 @@ export const Route = createFileRoute('/workpapers')({
 })
 
 function WorkpapersPage() {
+  const navigate = useNavigate()
   const [selectedWorkpaper, setSelectedWorkpaper] = React.useState<Workpaper | null>(null)
   const [isDetailOpen, setIsDetailOpen] = React.useState(false)
   const [filteredData, setFilteredData] = React.useState(workpapersData)
@@ -128,7 +129,7 @@ function WorkpapersPage() {
       <PageHeader
         description="Review and finalize control test documentation"
         actions={
-          <Button>
+          <Button onClick={() => navigate({ to: '/workpapers/generate' })}>
             <IconPlus className="h-4 w-4 mr-2" />
             Generate New Workpaper
           </Button>

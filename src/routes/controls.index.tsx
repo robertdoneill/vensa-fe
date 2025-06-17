@@ -1,5 +1,5 @@
 import * as React from "react"
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { IconPlus } from "@tabler/icons-react"
 
 import { PageLayout } from "@/components/page-layout"
@@ -40,11 +40,12 @@ interface Control {
   status: string
 }
 
-export const Route = createFileRoute('/controls')({
+export const Route = createFileRoute('/controls/')({
   component: ControlsPage,
 })
 
 function ControlsPage() {
+  const navigate = useNavigate()
   const [controls] = React.useState(controlsData)
   const [selectedControl, setSelectedControl] = React.useState<Control | null>(null)
   const [isDetailOpen, setIsDetailOpen] = React.useState(false)
@@ -170,7 +171,7 @@ function ControlsPage() {
       <PageHeader
         description="Define and manage control tests for compliance"
         actions={
-          <Button>
+          <Button onClick={() => navigate({ to: '/controls/create' })}>
             <IconPlus className="h-4 w-4 mr-2" />
             Create Control
           </Button>
