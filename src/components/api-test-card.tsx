@@ -12,9 +12,10 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { config } from "@/config"
-import { AuthService } from "@/services/auth"
-import { AuditService } from "@/services/audit"
+import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api/config"
+import { apiClient } from "@/lib/api/client"
+import { authService } from "@/lib/api/auth"
+import { evidenceApi } from "@/lib/api/evidence"
 
 interface ApiTestResult {
   endpoint: string
@@ -29,7 +30,7 @@ export function ApiTestCard() {
   const [isLoading, setIsLoading] = React.useState(false)
 
   React.useEffect(() => {
-    setIsAuthenticated(AuthService.isAuthenticated())
+    setIsAuthenticated(authService.isAuthenticated())
   }, [])
 
   const runApiTests = async () => {
@@ -40,7 +41,7 @@ export function ApiTestCard() {
 
     // Test 1: Check API URL
     tests.push({
-      endpoint: config.api.url,
+      endpoint: API_BASE_URL,
       status: 'pending',
       message: 'Checking API configuration...'
     })
@@ -49,7 +50,7 @@ export function ApiTestCard() {
     // Test 2: Check authentication
     if (isAuthenticated) {
       tests.push({
-        endpoint: '/token/verify',
+        endpoint: API_ENDPOINTS.auth.verify,
         status: 'pending',
         message: 'Verifying authentication token...'
       })
@@ -58,7 +59,7 @@ export function ApiTestCard() {
 
     // Test 3: Fetch control tests
     tests.push({
-      endpoint: '/audit/control-tests/',
+      endpoint: API_ENDPOINTS.audit.controlTests,
       status: 'pending',
       message: 'Fetching control tests...'
     })
@@ -70,15 +71,15 @@ export function ApiTestCard() {
       tests[0] = {
         ...tests[0],
         status: 'success',
-        message: `API URL configured: ${config.api.url}`
+        message: `API URL configured: ${API_BASE_URL}`
       }
       setTestResults([...tests])
 
       // Test authentication if logged in
       if (isAuthenticated) {
         try {
-          // Simple check - try to fetch control tests which requires auth
-          await AuditService.getControlTests()
+          // Verify token using our new API
+          await authService.verifyToken()
           tests[1] = {
             ...tests[1],
             status: 'success',
@@ -96,7 +97,7 @@ export function ApiTestCard() {
 
       // Test control tests endpoint
       try {
-        const controlTests = await AuditService.getControlTests()
+        const controlTests = await evidenceApi.getControlTests()
         tests[tests.length - 1] = {
           ...tests[tests.length - 1],
           status: 'success',
@@ -123,11 +124,47 @@ export function ApiTestCard() {
 
   const createTestData = async () => {
     try {
-      const testControl = await AuditService.createControlTest({
-        name: `Test Control ${new Date().toISOString()}`,
-        description: "Test control created from frontend",
-        frequency: 'weekly'
-      })
+      console.log('Creating control test with proper required fields...')
+      
+      // First get or create a workpaper
+      let workpapers = [];
+      try {
+        workpapers = await apiClient.get(API_ENDPOINTS.audit.workpapers);
+      } catch (error) {
+        console.log('Error fetching workpapers:', error);
+      }
+
+      let workpaperId = null;
+      if (workpapers.length > 0) {
+        workpaperId = workpapers[0].id;
+        console.log('Using existing workpaper:', workpaperId);
+      } else {
+        // Create a workpaper first
+        console.log('Creating workpaper...');
+        try {
+          const newWorkpaper = await apiClient.post(API_ENDPOINTS.audit.workpapers, {
+            name: 'Test Workpaper',
+            description: 'Auto-created for testing'
+          });
+          workpaperId = newWorkpaper.id;
+          console.log('Created workpaper:', workpaperId);
+        } catch (error) {
+          toast.error('Failed to create workpaper for testing');
+          return;
+        }
+      }
+      
+      const testData = {
+        name: 'Test Ctrl',  // Max 20 characters
+        objective: 'Test control objective for validation',
+        frequency: 'w',  // Weekly
+        criteria: 'Test passes when all validations are met',
+        workpaper: workpaperId
+      }
+      
+      console.log('Sending control test data:', testData)
+      
+      const testControl = await apiClient.post(API_ENDPOINTS.audit.controlTests, testData)
       
       toast.success('Test control created!', {
         description: `Created control: ${testControl.name}`
@@ -136,6 +173,7 @@ export function ApiTestCard() {
       // Re-run tests to see the new data
       runApiTests()
     } catch (error: any) {
+      console.error('Full error:', error)
       toast.error('Failed to create test data', {
         description: error.message
       })
@@ -174,7 +212,7 @@ export function ApiTestCard() {
               API Connection Test
             </CardTitle>
             <CardDescription>
-              Test connection to backend at {config.api.url}
+              Test connection to backend at {API_BASE_URL}
             </CardDescription>
           </div>
           <Badge variant={isAuthenticated ? "default" : "secondary"}>
@@ -231,12 +269,11 @@ export function ApiTestCard() {
         )}
 
         <div className="pt-4 border-t">
-          <h4 className="text-sm font-semibold mb-2">Quick Backend Setup:</h4>
-          <ol className="text-sm text-muted-foreground space-y-1">
-            <li>1. Ensure backend is running: <code className="text-xs bg-muted px-1 rounded">docker-compose -f docker-compose.local.yml up</code></li>
-            <li>2. Create superuser: <code className="text-xs bg-muted px-1 rounded">docker-compose -f docker-compose.local.yml exec web python manage.py createsuperuser</code></li>
-            <li>3. Check API docs: <a href="http://localhost:8000/api/schema/redoc/" target="_blank" rel="noopener noreferrer" className="underline">http://localhost:8000/api/schema/redoc/</a></li>
-          </ol>
+          <h4 className="text-sm font-semibold mb-2">Backend Information:</h4>
+          <div className="text-sm text-muted-foreground space-y-1">
+            <p>Using AWS backend at: <code className="text-xs bg-muted px-1 rounded">{API_BASE_URL}</code></p>
+            <p>API Documentation: <a href={`${API_BASE_URL}/api/schema/redoc/`} target="_blank" rel="noopener noreferrer" className="underline">{API_BASE_URL}/api/schema/redoc/</a></p>
+          </div>
         </div>
       </CardContent>
     </Card>

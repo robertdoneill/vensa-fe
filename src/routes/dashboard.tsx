@@ -1,10 +1,13 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { AppLayout } from "@/components/app-layout"
 import { ChartAreaInteractive } from "@/components/chart-area-interactive"
 import { AuditDataTable } from "@/components/audit-data-table"
 import { SectionCards } from "@/components/section-cards"
 import { QuickActions } from "@/components/quick-actions"
 import { ApiTestCard } from "@/components/api-test-card"
+import { AuthStatus } from "@/components/auth/auth-status"
+import { ApiDebug } from "@/components/debug/api-debug"
+import { authService } from '@/lib/api/auth'
 
 // import auditData from "@/data/audit-data.json"
 
@@ -100,6 +103,12 @@ type AuditTest = {
 }
 
 export const Route = createFileRoute('/dashboard')({
+  beforeLoad: () => {
+    // Redirect to login if not authenticated
+    if (!authService.isAuthenticated()) {
+      throw redirect({ to: '/login' });
+    }
+  },
   component: Dashboard,
 })
 
@@ -110,8 +119,10 @@ function Dashboard() {
         <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
           <SectionCards metrics={auditData.metrics} />
           <QuickActions />
-          <div className="px-4 lg:px-6">
+          <div className="px-4 lg:px-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
             <ApiTestCard />
+            <AuthStatus />
+            <ApiDebug />
           </div>
           <div className="px-4 lg:px-6">
             <ChartAreaInteractive data={auditData.activityTimeline} />
