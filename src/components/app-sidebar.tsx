@@ -31,13 +31,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { useAuth } from "@/lib/auth/auth-context"
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
+const getNavigationData = (user: any) => ({
   navMain: [
     {
       title: "Dashboard",
@@ -163,9 +159,33 @@ const data = {
       icon: IconFileAi,
     },
   ],
-}
+})
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user, isAuthenticated } = useAuth()
+  
+  // Get user data from JWT token or use fallback
+  const userData = React.useMemo(() => {
+    if (isAuthenticated && user) {
+      return {
+        name: user.first_name && user.last_name 
+          ? `${user.first_name} ${user.last_name}` 
+          : user.username,
+        email: user.email,
+        avatar: "/avatars/default.jpg", // You can add avatar logic later
+      }
+    }
+    
+    // Fallback for when not authenticated
+    return {
+      name: "Guest User",
+      email: "guest@vensa.ai",
+      avatar: "/avatars/default.jpg",
+    }
+  }, [user, isAuthenticated])
+
+  const data = getNavigationData(userData)
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -189,7 +209,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
   )

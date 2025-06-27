@@ -66,10 +66,35 @@ class ApiClient {
     }
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({
-        detail: response.statusText,
-      }));
-      throw new Error(error.detail || `Request failed: ${response.status}`);
+      let errorMessage = `Request failed: ${response.status}`;
+      try {
+        const error = await response.json();
+        console.error('API Error Response:', error);
+        
+        // Handle different error response formats
+        if (error.detail) {
+          errorMessage = error.detail;
+        } else if (error.message) {
+          errorMessage = error.message;
+        } else if (error.error) {
+          errorMessage = error.error;
+        } else if (typeof error === 'string') {
+          errorMessage = error;
+        } else if (typeof error === 'object') {
+          // Handle validation errors
+          const validationErrors = Object.entries(error).map(([field, errors]) => {
+            const errorList = Array.isArray(errors) ? errors : [errors];
+            return `${field}: ${errorList.join(', ')}`;
+          }).join('; ');
+          if (validationErrors) {
+            errorMessage = validationErrors;
+          }
+        }
+      } catch (parseError) {
+        errorMessage = response.statusText || `Request failed: ${response.status}`;
+      }
+      
+      throw new Error(errorMessage);
     }
 
     // Handle empty responses

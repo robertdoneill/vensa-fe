@@ -30,7 +30,16 @@ export const evidenceApi = {
     formData.append('file', file);
     formData.append('name', name || file.name);
     formData.append('type', file.type || 'application/octet-stream');
-    if (tags) formData.append('tags', tags);
+    formData.append('tags', tags || ''); // tags is required according to API doc
+
+    console.log('Uploading file:', {
+      fileName: file.name,
+      fileType: file.type,
+      fileSize: file.size,
+      name: name || file.name,
+      tags: tags || '',
+      endpoint: API_ENDPOINTS.audit.evidence
+    });
 
     return apiClient.post<Evidence>(API_ENDPOINTS.audit.evidence, formData);
   },

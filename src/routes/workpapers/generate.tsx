@@ -273,46 +273,50 @@ function GenerateWorkpaperPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {workpaperData.availableControlTests.map((test: any) => (
-                  <div
-                    key={test.id}
-                    className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-muted/50"
-                  >
-                    <Checkbox
-                      checked={selectedControlTests.includes(test.id)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSelectedControlTests([...selectedControlTests, test.id])
-                        } else {
-                          setSelectedControlTests(
-                            selectedControlTests.filter(id => id !== test.id)
-                          )
-                        }
-                      }}
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-medium">{test.name}</span>
-                        <Badge variant="outline" className="text-xs">
-                          {test.testType.toUpperCase()}
-                        </Badge>
-                        {test.lastResult && (
-                          <Badge 
-                            variant="outline" 
-                            className={getTestResultBadge(test.lastResult.status)}
-                          >
-                            Last: {test.lastResult.status}
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {test.objective}
-                      </p>
-                    </div>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">Loading control tests...</p>
                   </div>
-                ))}
-              </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {controlTests.map((test) => (
+                    <div
+                      key={test.id}
+                      className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-muted/50"
+                    >
+                      <Checkbox
+                        checked={selectedControlTests.includes(test.id.toString())}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedControlTests([...selectedControlTests, test.id.toString()])
+                          } else {
+                            setSelectedControlTests(
+                              selectedControlTests.filter(id => id !== test.id.toString())
+                            )
+                          }
+                        }}
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-medium">{test.name}</span>
+                          <Badge variant="outline" className="text-xs">
+                            {test.test_type?.toUpperCase() || 'CONTROL'}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            Owner: {test.owner?.name || 'Unassigned'}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {test.objective || 'No objective specified'}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 

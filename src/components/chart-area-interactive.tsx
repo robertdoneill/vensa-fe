@@ -1,36 +1,15 @@
-"use client"
-
 import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 
-import { useIsMobile } from "@/hooks/use-mobile"
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  type ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  ToggleGroup,
-  ToggleGroupItem,
-} from "@/components/ui/toggle-group"
-
-export const description = "Control test activity timeline"
+import { controlsApi } from "@/lib/api/controls"
+import { exceptionsApi } from "@/lib/api/exceptions"
 
 interface ActivityData {
   date: string
@@ -40,192 +19,208 @@ interface ActivityData {
 }
 
 interface ChartAreaInteractiveProps {
-  data: ActivityData[]
+  data?: ActivityData[]
 }
 
-const chartConfig = {
-  activity: {
-    label: "Control Test Activity",
-  },
-  completed: {
-    label: "Tests Completed",
-    color: "hsl(var(--chart-1))",
-  },
-  exceptions: {
-    label: "Exceptions Found",
-    color: "hsl(var(--chart-2))",
-  },
-  remediated: {
-    label: "Items Remediated",
-    color: "hsl(var(--chart-3))",
-  },
-} satisfies ChartConfig
-
-export function ChartAreaInteractive({ data }: ChartAreaInteractiveProps) {
-  const isMobile = useIsMobile()
-  const [timeRange, setTimeRange] = React.useState("15d")
+export function ChartAreaInteractive({ data: propData }: ChartAreaInteractiveProps) {
+  const [chartData, setChartData] = React.useState<ActivityData[]>([])
+  const [isLoading, setIsLoading] = React.useState(true)
 
   React.useEffect(() => {
-    if (isMobile) {
-      setTimeRange("7d")
-    }
-  }, [isMobile])
+    const fetchActivityData = async () => {
+      try {
+        setIsLoading(true)
+        
+        // If prop data is provided, use it (for backward compatibility)
+        if (propData && propData.length > 0) {
+          setChartData(propData)
+          setIsLoading(false)
+          return
+        }
 
-  const filteredData = data.filter((item) => {
-    const date = new Date(item.date)
-    const referenceDate = new Date("2024-01-15")
-    let daysToSubtract = 15
-    if (timeRange === "30d") {
-      daysToSubtract = 30
-    } else if (timeRange === "7d") {
-      daysToSubtract = 7
+        // Otherwise, fetch real data and generate activity timeline
+        const [controls, exceptions] = await Promise.all([
+          controlsApi.getControlTests(),
+          exceptionsApi.getExceptionsWithCounts()
+        ])
+
+        // Generate last 30 days of activity data
+        const activityData: ActivityData[] = []
+        const today = new Date()
+        
+        for (let i = 29; i >= 0; i--) {
+          const date = new Date(today)
+          date.setDate(date.getDate() - i)
+          const dateStr = date.toISOString().split('T')[0]
+          
+          // Filter controls and exceptions created on this date
+          const controlsOnDate = controls.filter(c => 
+            new Date(c.created_at).toDateString() === date.toDateString()
+          ).length
+          
+          const exceptionsOnDate = exceptions.filter(e => 
+            new Date(e.created_at).toDateString() === date.toDateString()
+          ).length
+          
+          const remediatedOnDate = exceptions.filter(e => 
+            e.status === 'resolved' && 
+            new Date(e.updated_at).toDateString() === date.toDateString()
+          ).length
+
+          activityData.push({
+            date: dateStr,
+            completed: controlsOnDate,
+            exceptions: exceptionsOnDate,
+            remediated: remediatedOnDate
+          })
+        }
+
+        setChartData(activityData)
+      } catch (error) {
+        console.error('Failed to fetch activity data:', error)
+        // Show empty state on error
+        setChartData([])
+      } finally {
+        setIsLoading(false)
+      }
     }
-    const startDate = new Date(referenceDate)
-    startDate.setDate(startDate.getDate() - daysToSubtract)
-    return date >= startDate
-  })
+
+    fetchActivityData()
+  }, [propData])
+
+  const generateSampleData = (): ActivityData[] => {
+    const data: ActivityData[] = []
+    const today = new Date()
+    
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(today)
+      date.setDate(date.getDate() - i)
+      
+      data.push({
+        date: date.toISOString().split('T')[0],
+        completed: Math.floor(Math.random() * 5),
+        exceptions: Math.floor(Math.random() * 3),
+        remediated: Math.floor(Math.random() * 2)
+      })
+    }
+    
+    return data
+  }
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr)
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  }
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="rounded-lg border bg-background p-2 shadow-sm">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col">
+              <span className="text-[0.70rem] uppercase text-muted-foreground">
+                Date
+              </span>
+              <span className="font-bold text-muted-foreground">
+                {formatDate(label)}
+              </span>
+            </div>
+            {payload.map((entry: any, index: number) => (
+              <div key={index} className="flex flex-col">
+                <span className="text-[0.70rem] uppercase text-muted-foreground">
+                  {entry.dataKey === 'completed' ? 'Completed' : 
+                   entry.dataKey === 'exceptions' ? 'Exceptions' : 'Remediated'}
+                </span>
+                <span className="font-bold" style={{ color: entry.color }}>
+                  {entry.value}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+    return null
+  }
 
   return (
-    <Card className="@container/card">
-      <CardHeader>
-        <CardTitle>Control Test Activity</CardTitle>
-        <CardDescription>
-          <span className="hidden @[540px]/card:block">
-            Test completions, exceptions, and remediation status
-          </span>
-          <span className="@[540px]/card:hidden">Test activity overview</span>
-        </CardDescription>
-        <CardAction>
-          <ToggleGroup
-            type="single"
-            value={timeRange}
-            onValueChange={setTimeRange}
-            variant="outline"
-            className="hidden *:data-[slot=toggle-group-item]:!px-4 @[767px]/card:flex"
-          >
-            <ToggleGroupItem value="15d">Last 15 days</ToggleGroupItem>
-            <ToggleGroupItem value="30d">Last 30 days</ToggleGroupItem>
-            <ToggleGroupItem value="7d">Last 7 days</ToggleGroupItem>
-          </ToggleGroup>
-          <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger
-              className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden"
-              size="sm"
-              aria-label="Select a value"
-            >
-              <SelectValue placeholder="Last 15 days" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectItem value="15d" className="rounded-lg">
-                Last 15 days
-              </SelectItem>
-              <SelectItem value="30d" className="rounded-lg">
-                Last 30 days
-              </SelectItem>
-              <SelectItem value="7d" className="rounded-lg">
-                Last 7 days
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </CardAction>
+    <Card>
+      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+        <div className="grid flex-1 gap-1 text-center sm:text-left">
+          <CardTitle>Control Test Activity</CardTitle>
+          <CardDescription>
+            Daily activity across all audit areas
+          </CardDescription>
+        </div>
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-        <ChartContainer
-          config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
-        >
-          <AreaChart data={filteredData}>
-            <defs>
-              <linearGradient id="fillCompleted" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-completed)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-completed)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-              <linearGradient id="fillExceptions" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-exceptions)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-exceptions)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-              <linearGradient id="fillRemediated" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-remediated)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-remediated)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-            </defs>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              minTickGap={32}
-              tickFormatter={(value) => {
-                const date = new Date(value)
-                return date.toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                })
-              }}
-            />
-            <ChartTooltip
-              cursor={false}
-              defaultIndex={isMobile ? -1 : 10}
-              content={
-                <ChartTooltipContent
-                  labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })
-                  }}
-                  indicator="dot"
-                />
-              }
-            />
-            <Area
-              dataKey="completed"
-              type="natural"
-              fill="url(#fillCompleted)"
-              stroke="var(--color-completed)"
-              stackId="a"
-            />
-            <Area
-              dataKey="exceptions"
-              type="natural"
-              fill="url(#fillExceptions)"
-              stroke="var(--color-exceptions)"
-              stackId="b"
-            />
-            <Area
-              dataKey="remediated"
-              type="natural"
-              fill="url(#fillRemediated)"
-              stroke="var(--color-remediated)"
-              stackId="c"
-            />
-          </AreaChart>
-        </ChartContainer>
+        {isLoading ? (
+          <div className="flex items-center justify-center h-[250px]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading activity data...</p>
+            </div>
+          </div>
+        ) : chartData.length === 0 ? (
+          <div className="flex items-center justify-center h-[250px]">
+            <div className="text-center">
+              <p className="text-muted-foreground mb-2">No activity data available</p>
+              <p className="text-sm text-muted-foreground">Create control tests to see activity</p>
+            </div>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={250}>
+            <AreaChart data={chartData}>
+              <defs>
+                <linearGradient id="completed" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
+                </linearGradient>
+                <linearGradient id="exceptions" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0.1}/>
+                </linearGradient>
+                <linearGradient id="remediated" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(142 76% 36%)" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="hsl(142 76% 36%)" stopOpacity={0.1}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis 
+                dataKey="date" 
+                tickFormatter={formatDate}
+                className="text-xs fill-muted-foreground"
+                interval="preserveStartEnd"
+              />
+              <YAxis className="text-xs fill-muted-foreground" />
+              <Tooltip content={<CustomTooltip />} />
+              <Area
+                type="monotone"
+                dataKey="completed"
+                stackId="1"
+                stroke="hsl(var(--primary))"
+                fill="url(#completed)"
+                fillOpacity={0.6}
+              />
+              <Area
+                type="monotone"
+                dataKey="exceptions"
+                stackId="1"
+                stroke="hsl(var(--destructive))"
+                fill="url(#exceptions)"
+                fillOpacity={0.6}
+              />
+              <Area
+                type="monotone"
+                dataKey="remediated"
+                stackId="1"
+                stroke="hsl(142 76% 36%)"
+                fill="url(#remediated)"
+                fillOpacity={0.6}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
       </CardContent>
     </Card>
   )

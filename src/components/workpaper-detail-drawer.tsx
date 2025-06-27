@@ -117,6 +117,11 @@ export function WorkpaperDetailDrawer({ workpaper, isOpen, onClose }: WorkpaperD
     onClose()
   }
 
+  const handleEditWorkpaper = () => {
+    navigate({ to: `/workpapers/${workpaper.id}/edit` })
+    onClose()
+  }
+
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
       <DrawerContent className="max-h-[85vh]">
@@ -144,7 +149,7 @@ export function WorkpaperDetailDrawer({ workpaper, isOpen, onClose }: WorkpaperD
                   <IconFile className="h-4 w-4" />
                   <span>Control Test</span>
                 </div>
-                <div className="font-medium">{workpaper.controlTest}</div>
+                <div className="font-medium">{workpaper.controlTest || 'No control test linked'}</div>
               </div>
               
               <div className="space-y-2">
@@ -190,7 +195,9 @@ export function WorkpaperDetailDrawer({ workpaper, isOpen, onClose }: WorkpaperD
                       <IconFileText className="h-4 w-4" />
                       <span>Description</span>
                     </h4>
-                    <p className="text-sm text-muted-foreground">{workpaper.description}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {workpaper.description || 'No description available'}
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -198,55 +205,75 @@ export function WorkpaperDetailDrawer({ workpaper, isOpen, onClose }: WorkpaperD
                       <IconTarget className="h-4 w-4" />
                       <span>Objective</span>
                     </h4>
-                    <p className="text-sm text-muted-foreground">{workpaper.objective}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {workpaper.objective || 'No objective specified'}
+                    </p>
                   </div>
 
                   <div className="space-y-2">
                     <h4 className="text-sm font-semibold">Criteria</h4>
-                    <p className="text-sm text-muted-foreground">{workpaper.criteria}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {workpaper.criteria || 'No criteria specified'}
+                    </p>
                   </div>
                 </div>
               </TabsContent>
 
               <TabsContent value="findings" className="space-y-4 mt-4">
                 <div className="space-y-3">
-                  {workpaper.aiFindings.map((finding, index) => (
-                    <div key={index} className="border rounded-lg p-4 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          {getFindingStatusIcon(finding.status)}
-                          <h5 className="font-medium">{finding.step}</h5>
+                  {workpaper.aiFindings && workpaper.aiFindings.length > 0 ? (
+                    workpaper.aiFindings.map((finding, index) => (
+                      <div key={index} className="border rounded-lg p-4 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            {getFindingStatusIcon(finding.status)}
+                            <h5 className="font-medium">{finding.step}</h5>
+                          </div>
+                          {getFindingStatusBadge(finding.status)}
                         </div>
-                        {getFindingStatusBadge(finding.status)}
+                        <p className="text-sm text-muted-foreground">{finding.outcome}</p>
                       </div>
-                      <p className="text-sm text-muted-foreground">{finding.outcome}</p>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <IconAlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>No AI findings available for this workpaper</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </TabsContent>
 
               <TabsContent value="comments" className="space-y-4 mt-4">
                 <div className="space-y-3">
                   <div className="bg-muted/50 rounded-lg p-4">
-                    <p className="text-sm">{workpaper.comments}</p>
+                    <p className="text-sm">
+                      {workpaper.comments || 'No comments available for this workpaper'}
+                    </p>
                   </div>
                 </div>
               </TabsContent>
 
               <TabsContent value="audit-trail" className="space-y-4 mt-4">
                 <div className="space-y-3">
-                  {workpaper.auditTrail.map((entry, index) => (
-                    <div key={index} className="flex items-start space-x-3">
-                      <IconActivity className="h-4 w-4 text-muted-foreground mt-0.5" />
-                      <div className="flex-1 space-y-1">
-                        <p className="text-sm">
-                          <span className="font-medium">{entry.user}</span>
-                          <span className="text-muted-foreground"> {entry.action}</span>
-                        </p>
-                        <p className="text-xs text-muted-foreground">{entry.date}</p>
+                  {workpaper.auditTrail && workpaper.auditTrail.length > 0 ? (
+                    workpaper.auditTrail.map((entry, index) => (
+                      <div key={index} className="flex items-start space-x-3">
+                        <IconActivity className="h-4 w-4 text-muted-foreground mt-0.5" />
+                        <div className="flex-1 space-y-1">
+                          <p className="text-sm">
+                            <span className="font-medium">{entry.user}</span>
+                            <span className="text-muted-foreground"> {entry.action}</span>
+                          </p>
+                          <p className="text-xs text-muted-foreground">{entry.date}</p>
+                        </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <IconActivity className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>No audit trail available for this workpaper</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </TabsContent>
             </Tabs>
@@ -264,7 +291,7 @@ export function WorkpaperDetailDrawer({ workpaper, isOpen, onClose }: WorkpaperD
                 <IconReportAnalytics className="h-4 w-4 mr-2" />
                 View Report
               </Button>
-              <Button>
+              <Button onClick={handleEditWorkpaper}>
                 Edit Workpaper
               </Button>
             </div>

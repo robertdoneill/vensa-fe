@@ -141,14 +141,20 @@ export function ApiTestCard() {
       } else {
         // Create a workpaper first
         console.log('Creating workpaper...');
+        const workpaperData = {
+          title: 'Test Workpaper',
+          description: 'Auto-created for testing',
+          period_start: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
+          period_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // One year from now
+          status: 'draft'
+        };
+        console.log('Sending workpaper data:', workpaperData);
         try {
-          const newWorkpaper = await apiClient.post(API_ENDPOINTS.audit.workpapers, {
-            name: 'Test Workpaper',
-            description: 'Auto-created for testing'
-          });
+          const newWorkpaper = await apiClient.post(API_ENDPOINTS.audit.workpapers, workpaperData);
           workpaperId = newWorkpaper.id;
           console.log('Created workpaper:', workpaperId);
-        } catch (error) {
+        } catch (error: any) {
+          console.log('Workpaper creation error details:', error.response?.data || error);
           toast.error('Failed to create workpaper for testing');
           return;
         }

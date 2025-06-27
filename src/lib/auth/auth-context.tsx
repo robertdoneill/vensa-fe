@@ -19,17 +19,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Verify token on mount
+  // Verify token and fetch user on mount
   useEffect(() => {
     const verifyAuth = async () => {
       const currentToken = authService.getAccessToken();
       if (currentToken) {
         const isValid = await authService.verifyToken();
-        if (!isValid) {
+        if (isValid) {
+          // Fetch user data
+          try {
+            const userData = await authService.getCurrentUser();
+            setUser(userData);
+          } catch (error) {
+            console.log('Failed to fetch user data:', error);
+          }
+        } else {
           // Try to refresh the token
           try {
             const newToken = await authService.refreshAccessToken();
             setToken(newToken);
+            // Try to fetch user data with new token
+            try {
+              const userData = await authService.getCurrentUser();
+              setUser(userData);
+            } catch (error) {
+              console.log('Failed to fetch user data after refresh:', error);
+            }
           } catch {
             authService.logout();
             setToken(null);
@@ -46,6 +61,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await authService.login(credentials);
       setToken(response.access);
+      
+      // Fetch user data after successful login
+      try {
+        const userData = await authService.getCurrentUser();
+        setUser(userData);
+      } catch (error) {
+        console.log('Failed to fetch user data after login:', error);
+      }
+      
       toast.success('Logged in successfully');
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Invalid credentials');

@@ -117,7 +117,7 @@ function Dashboard() {
     <AppLayout>
       <div className="@container/main flex flex-1 flex-col gap-2">
         <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-          <SectionCards metrics={auditData.metrics} />
+          <SectionCards />
           <QuickActions />
           <div className="px-4 lg:px-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
             <ApiTestCard />
@@ -125,9 +125,9 @@ function Dashboard() {
             <ApiDebug />
           </div>
           <div className="px-4 lg:px-6">
-            <ChartAreaInteractive data={auditData.activityTimeline} />
+            <ChartAreaInteractive />
           </div>
-          <AuditDataTable data={auditData.recentTests as AuditTest[]} />
+          <AuditDataTable />
         </div>
       </div>
     </AppLayout>

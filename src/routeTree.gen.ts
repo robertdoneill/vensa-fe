@@ -19,9 +19,11 @@ import { Route as CuecMappingRouteImport } from './routes/cuec-mapping'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ControlsIndexRouteImport } from './routes/controls.index'
 import { Route as WorkpapersGenerateRouteImport } from './routes/workpapers/generate'
+import { Route as WorkpapersIdRouteImport } from './routes/workpapers/$id'
 import { Route as ControlsLayoutRouteImport } from './routes/controls.layout'
 import { Route as ControlsCreateRouteImport } from './routes/controls/create'
 import { Route as WorkpapersReportsIdRouteImport } from './routes/workpapers/reports/$id'
+import { Route as WorkpapersIdEditRouteImport } from './routes/workpapers/$id/edit'
 
 const WorkpapersRoute = WorkpapersRouteImport.update({
   id: '/workpapers',
@@ -73,6 +75,11 @@ const WorkpapersGenerateRoute = WorkpapersGenerateRouteImport.update({
   path: '/generate',
   getParentRoute: () => WorkpapersRoute,
 } as any)
+const WorkpapersIdRoute = WorkpapersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => WorkpapersRoute,
+} as any)
 const ControlsLayoutRoute = ControlsLayoutRouteImport.update({
   id: '/controls/layout',
   path: '/controls/layout',
@@ -88,6 +95,11 @@ const WorkpapersReportsIdRoute = WorkpapersReportsIdRouteImport.update({
   path: '/reports/$id',
   getParentRoute: () => WorkpapersRoute,
 } as any)
+const WorkpapersIdEditRoute = WorkpapersIdEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => WorkpapersIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -100,8 +112,10 @@ export interface FileRoutesByFullPath {
   '/workpapers': typeof WorkpapersRouteWithChildren
   '/controls/create': typeof ControlsCreateRoute
   '/controls/layout': typeof ControlsLayoutRoute
+  '/workpapers/$id': typeof WorkpapersIdRouteWithChildren
   '/workpapers/generate': typeof WorkpapersGenerateRoute
   '/controls': typeof ControlsIndexRoute
+  '/workpapers/$id/edit': typeof WorkpapersIdEditRoute
   '/workpapers/reports/$id': typeof WorkpapersReportsIdRoute
 }
 export interface FileRoutesByTo {
@@ -115,8 +129,10 @@ export interface FileRoutesByTo {
   '/workpapers': typeof WorkpapersRouteWithChildren
   '/controls/create': typeof ControlsCreateRoute
   '/controls/layout': typeof ControlsLayoutRoute
+  '/workpapers/$id': typeof WorkpapersIdRouteWithChildren
   '/workpapers/generate': typeof WorkpapersGenerateRoute
   '/controls': typeof ControlsIndexRoute
+  '/workpapers/$id/edit': typeof WorkpapersIdEditRoute
   '/workpapers/reports/$id': typeof WorkpapersReportsIdRoute
 }
 export interface FileRoutesById {
@@ -131,8 +147,10 @@ export interface FileRoutesById {
   '/workpapers': typeof WorkpapersRouteWithChildren
   '/controls/create': typeof ControlsCreateRoute
   '/controls/layout': typeof ControlsLayoutRoute
+  '/workpapers/$id': typeof WorkpapersIdRouteWithChildren
   '/workpapers/generate': typeof WorkpapersGenerateRoute
   '/controls/': typeof ControlsIndexRoute
+  '/workpapers/$id/edit': typeof WorkpapersIdEditRoute
   '/workpapers/reports/$id': typeof WorkpapersReportsIdRoute
 }
 export interface FileRouteTypes {
@@ -148,8 +166,10 @@ export interface FileRouteTypes {
     | '/workpapers'
     | '/controls/create'
     | '/controls/layout'
+    | '/workpapers/$id'
     | '/workpapers/generate'
     | '/controls'
+    | '/workpapers/$id/edit'
     | '/workpapers/reports/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -163,8 +183,10 @@ export interface FileRouteTypes {
     | '/workpapers'
     | '/controls/create'
     | '/controls/layout'
+    | '/workpapers/$id'
     | '/workpapers/generate'
     | '/controls'
+    | '/workpapers/$id/edit'
     | '/workpapers/reports/$id'
   id:
     | '__root__'
@@ -178,8 +200,10 @@ export interface FileRouteTypes {
     | '/workpapers'
     | '/controls/create'
     | '/controls/layout'
+    | '/workpapers/$id'
     | '/workpapers/generate'
     | '/controls/'
+    | '/workpapers/$id/edit'
     | '/workpapers/reports/$id'
   fileRoutesById: FileRoutesById
 }
@@ -269,6 +293,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkpapersGenerateRouteImport
       parentRoute: typeof WorkpapersRoute
     }
+    '/workpapers/$id': {
+      id: '/workpapers/$id'
+      path: '/$id'
+      fullPath: '/workpapers/$id'
+      preLoaderRoute: typeof WorkpapersIdRouteImport
+      parentRoute: typeof WorkpapersRoute
+    }
     '/controls/layout': {
       id: '/controls/layout'
       path: '/controls/layout'
@@ -290,15 +321,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkpapersReportsIdRouteImport
       parentRoute: typeof WorkpapersRoute
     }
+    '/workpapers/$id/edit': {
+      id: '/workpapers/$id/edit'
+      path: '/edit'
+      fullPath: '/workpapers/$id/edit'
+      preLoaderRoute: typeof WorkpapersIdEditRouteImport
+      parentRoute: typeof WorkpapersIdRoute
+    }
   }
 }
 
+interface WorkpapersIdRouteChildren {
+  WorkpapersIdEditRoute: typeof WorkpapersIdEditRoute
+}
+
+const WorkpapersIdRouteChildren: WorkpapersIdRouteChildren = {
+  WorkpapersIdEditRoute: WorkpapersIdEditRoute,
+}
+
+const WorkpapersIdRouteWithChildren = WorkpapersIdRoute._addFileChildren(
+  WorkpapersIdRouteChildren,
+)
+
 interface WorkpapersRouteChildren {
+  WorkpapersIdRoute: typeof WorkpapersIdRouteWithChildren
   WorkpapersGenerateRoute: typeof WorkpapersGenerateRoute
   WorkpapersReportsIdRoute: typeof WorkpapersReportsIdRoute
 }
 
 const WorkpapersRouteChildren: WorkpapersRouteChildren = {
+  WorkpapersIdRoute: WorkpapersIdRouteWithChildren,
   WorkpapersGenerateRoute: WorkpapersGenerateRoute,
   WorkpapersReportsIdRoute: WorkpapersReportsIdRoute,
 }

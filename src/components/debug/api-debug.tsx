@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { API_BASE_URL } from '@/lib/api/config';
+import { API_BASE_URL, API_ENDPOINTS } from '@/lib/api/config';
+import { apiClient } from '@/lib/api/client';
 
 export function ApiDebug() {
   const [loading, setLoading] = useState(false);
@@ -35,47 +36,62 @@ export function ApiDebug() {
 
   const testControlTestEndpoint = async () => {
     try {
-      // First, check if there are any workpapers available
+      // Use our proper API client that handles token refresh
       console.log('Checking for existing workpapers...');
-      const workpapersResponse = await fetch(`${API_BASE_URL}/api/audit/workpapers/`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        }
-      });
+      
+      let workpapers = [];
+      try {
+        workpapers = await apiClient.get(API_ENDPOINTS.audit.workpapers);
+        console.log('Available workpapers:', workpapers);
+      } catch (error) {
+        console.log('Error fetching workpapers:', error);
+      }
 
       let workpaperId = null;
-      if (workpapersResponse.ok) {
-        const workpapers = await workpapersResponse.json();
-        console.log('Available workpapers:', workpapers);
-        
-        if (workpapers.length > 0) {
-          workpaperId = workpapers[0].id;
-          console.log(`Using existing workpaper ID: ${workpaperId}`);
-        } else {
-          // Try to create a workpaper first
-          console.log('No workpapers found, creating one...');
-          const createWorkpaperResponse = await fetch(`${API_BASE_URL}/api/audit/workpapers/`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-            },
-            body: JSON.stringify({
-              name: 'Test Workpaper',
-              description: 'Auto-created for testing'
-            })
-          });
-
-          if (createWorkpaperResponse.ok) {
-            const newWorkpaper = await createWorkpaperResponse.json();
-            workpaperId = newWorkpaper.id;
-            console.log(`Created new workpaper ID: ${workpaperId}`);
-          } else {
-            const error = await createWorkpaperResponse.text();
-            console.log('Failed to create workpaper:', error);
-            toast.error('Failed to create workpaper for testing');
-            return;
+      if (workpapers.length > 0) {
+        workpaperId = workpapers[0].id;
+        console.log(`Using existing workpaper ID: ${workpaperId}`);
+      } else {
+        // Try to create a workpaper first - let's see what error we get
+        console.log('No workpapers found, creating one...');
+        try {
+          const workpaperData = {
+            name: 'Test Workpaper',
+            description: 'Auto-created for testing'
+          };
+          console.log('Sending workpaper data:', workpaperData);
+          
+          const newWorkpaper = await apiClient.post(API_ENDPOINTS.audit.workpapers, workpaperData);
+          workpaperId = newWorkpaper.id;
+          console.log(`Created new workpaper ID: ${workpaperId}`);
+        } catch (error: any) {
+          console.log('Failed to create workpaper:', error);
+          
+          // Try to get the actual error details
+          try {
+            const response = await fetch(`${API_BASE_URL}/api/audit/workpapers/`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+              },
+              body: JSON.stringify({
+                name: 'Test Workpaper',
+                description: 'Auto-created for testing'
+              })
+            });
+            
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.log('Workpaper creation error details:', errorText);
+              toast.error(`Workpaper error: ${errorText}`);
+            }
+          } catch (debugError) {
+            console.log('Debug error:', debugError);
           }
+          
+          toast.error('Failed to create workpaper for testing');
+          return;
         }
       }
 
@@ -90,28 +106,13 @@ export function ApiDebug() {
 
       console.log('Creating control test with data:', controlTestData);
 
-      const response = await fetch(`${API_BASE_URL}/api/audit/control-tests/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify(controlTestData)
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.log('Control test creation failed:', errorText);
-        try {
-          const errorJson = JSON.parse(errorText);
-          toast.error(`Error: ${JSON.stringify(errorJson)}`);
-        } catch {
-          toast.error(`Error: ${response.status} - ${errorText}`);
-        }
-      } else {
-        const result = await response.json();
+      try {
+        const result = await apiClient.post(API_ENDPOINTS.audit.controlTests, controlTestData);
         toast.success('Control test created successfully!');
         console.log('Success:', result);
+      } catch (error: any) {
+        console.log('Control test creation failed:', error);
+        toast.error(`Error: ${error.message}`);
       }
     } catch (error: any) {
       console.error('Test error:', error);

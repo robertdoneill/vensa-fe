@@ -43,28 +43,32 @@ import {
 import { MoreHorizontal, Edit, Trash2, History } from "lucide-react"
 
 interface Control {
-  id: string
+  id: number
   name: string
   objective: string
-  frequency: string
+  frequency: 'd' | 'w' | 'm' | 'q' | 'y'
   owner: {
-    id: string
+    id: number
     name: string
-    email: string
   }
   criteria: string
-  testType: string
-  createdAt: string
-  updatedAt: string
-  lastResult: {
-    id: string
+  created_at: string
+  updated_at: string
+  workpaper_details: {
+    id: number
+    title: string
+  }
+  lastResult?: {
+    id?: number
     status: string
     testDate: string
     tester: {
-      id: string
+      id: number
       name: string
     }
-  } | null
+    outcome: boolean
+    metadata: string
+  }
   commentCount: number
   evidenceCount: number
   status: string
@@ -73,7 +77,7 @@ interface Control {
 interface ControlsDataTableProps {
   data: Control[]
   onRowClick: (control: Control) => void
-  onRunTest?: (controlId: string) => void
+  onRunTest?: (controlId: string | number) => void
 }
 
 const getTestTypeIcon = (testType: string) => {
@@ -106,17 +110,25 @@ const getTestTypeLabel = (testType: string) => {
 
 const getFrequencyBadge = (frequency: string) => {
   const colors: Record<string, string> = {
-    daily: "bg-purple-100 text-purple-800",
-    weekly: "bg-blue-100 text-blue-800",
-    monthly: "bg-cyan-100 text-cyan-800",
-    quarterly: "bg-green-100 text-green-800",
-    annually: "bg-orange-100 text-orange-800",
+    d: "bg-purple-100 text-purple-800",
+    w: "bg-blue-100 text-blue-800", 
+    m: "bg-cyan-100 text-cyan-800",
+    q: "bg-green-100 text-green-800",
+    y: "bg-orange-100 text-orange-800",
+  }
+
+  const labels: Record<string, string> = {
+    d: "Daily",
+    w: "Weekly",
+    m: "Monthly", 
+    q: "Quarterly",
+    y: "Yearly"
   }
   
   return (
     <Badge variant="secondary" className={colors[frequency] || "bg-gray-100 text-gray-800"}>
       <IconCalendar className="h-3 w-3 mr-1" />
-      {frequency}
+      {labels[frequency] || frequency}
     </Badge>
   )
 }
@@ -185,7 +197,6 @@ export function ControlsDataTable({ data, onRowClick, onRunTest }: ControlsDataT
       cell: ({ row }) => (
         <div className="space-y-1">
           <div className="flex items-center space-x-2">
-            {getTestTypeIcon(row.original.testType)}
             <span className="font-medium">{row.getValue("name")}</span>
           </div>
           <div className="flex items-center space-x-3 text-xs text-muted-foreground">
@@ -215,13 +226,16 @@ export function ControlsDataTable({ data, onRowClick, onRunTest }: ControlsDataT
       ),
     },
     {
-      accessorKey: "testType",
-      header: "Type",
-      cell: ({ row }) => (
-        <Badge variant="outline">
-          {getTestTypeLabel(row.getValue("testType"))}
-        </Badge>
-      ),
+      accessorKey: "workpaper_details",
+      header: "Workpaper",
+      cell: ({ row }) => {
+        const workpaper = row.getValue("workpaper_details") as Control["workpaper_details"]
+        return (
+          <Badge variant="outline">
+            {workpaper.title}
+          </Badge>
+        )
+      },
     },
     {
       accessorKey: "frequency",

@@ -13,10 +13,19 @@ export interface TokenResponse {
 
 export interface User {
   id: number;
+  password?: string;
+  last_login?: string;
+  is_superuser?: boolean;
   username: string;
-  email: string;
   first_name: string;
   last_name: string;
+  email: string;
+  is_staff?: boolean;
+  is_active?: boolean;
+  date_joined?: string;
+  active_organization?: number;
+  groups?: number[];
+  user_permissions?: number[];
 }
 
 class AuthService {
@@ -62,6 +71,50 @@ class AuthService {
       return true;
     } catch {
       return false;
+    }
+  }
+
+  // Decode JWT token to get user info
+  private decodeToken(token: string): any {
+    try {
+      const payload = token.split('.')[1];
+      const decoded = atob(payload);
+      return JSON.parse(decoded);
+    } catch {
+      return null;
+    }
+  }
+
+  getUserFromToken(): User | null {
+    if (!this.accessToken) return null;
+    
+    const decoded = this.decodeToken(this.accessToken);
+    if (!decoded) return null;
+
+    // JWT typically contains user_id, username, etc.
+    return {
+      id: decoded.user_id || decoded.sub,
+      username: decoded.username || decoded.preferred_username || 'Unknown User',
+      email: decoded.email || 'user@vensa.ai',
+      first_name: decoded.first_name || '',
+      last_name: decoded.last_name || '',
+    };
+  }
+
+  async getCurrentUser(): Promise<User> {
+    // First get user ID from JWT token
+    const userFromToken = this.getUserFromToken();
+    if (!userFromToken?.id) {
+      throw new Error('No user ID found in token');
+    }
+
+    // Fetch full user data from BE API using the user ID
+    try {
+      return await apiClient.get<User>(`${API_ENDPOINTS.user.users}${userFromToken.id}/`);
+    } catch (error) {
+      // Fallback to token data if API fails
+      console.log('Failed to fetch user from API, using token data:', error);
+      return userFromToken;
     }
   }
 

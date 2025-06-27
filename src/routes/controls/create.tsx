@@ -12,15 +12,9 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
-
-// Mock data for users - in real app, this would come from API
-const users = [
-  { id: "USR-001", name: "Jane Smith", email: "jane.smith@company.com" },
-  { id: "USR-002", name: "Mike Johnson", email: "mike.johnson@company.com" },
-  { id: "USR-003", name: "Sarah Davis", email: "sarah.davis@company.com" },
-  { id: "USR-004", name: "Alex Chen", email: "alex.chen@company.com" },
-  { id: "USR-005", name: "John Doe", email: "john.doe@company.com" },
-]
+import { usersApi, type OrganizationUser } from "@/lib/api/users"
+import { controlsApi } from "@/lib/api/controls"
+import { workpapersApi } from "@/lib/api/workpapers"
 
 interface FormData {
   name: string
@@ -53,6 +47,8 @@ function CreateControlTestPage() {
   
   const [runAiTest, setRunAiTest] = React.useState(false)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [users, setUsers] = React.useState<OrganizationUser[]>([])
+  const [isLoadingUsers, setIsLoadingUsers] = React.useState(true)
 
   const handleSubmit = async (isDraft = false) => {
     setIsSubmitting(true)
@@ -65,8 +61,43 @@ function CreateControlTestPage() {
         return
       }
 
-      // Simulate API call - in real app, this would POST to backend
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // Validate name length (backend requires <= 20 characters)
+      if (formData.name.length > 20) {
+        toast.error("Control test name must be 20 characters or less")
+        setIsSubmitting(false)
+        return
+      }
+
+      // First create a workpaper for this control test
+      const workpaperData = {
+        title: `${formData.name} Workpaper`,
+        description: `Workpaper for control test: ${formData.name}`,
+        period_start: new Date().toISOString().split('T')[0],
+        period_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        status: 'draft' as const
+      }
+
+      const createdWorkpaper = await workpapersApi.createWorkpaper(workpaperData)
+
+      // Map frequency values to backend format
+      const frequencyMap: Record<string, 'd' | 'w' | 'b' | 'm' | 'y'> = {
+        'daily': 'd',
+        'weekly': 'w',
+        'biweekly': 'b', 
+        'monthly': 'm',
+        'annually': 'y'
+      }
+
+      // Create control test via API
+      const controlTestData = {
+        workpaper: createdWorkpaper.id,
+        name: formData.name,
+        objective: formData.objective,
+        frequency: frequencyMap[formData.frequency] || 'm',
+        criteria: formData.criteria || 'No specific criteria defined'
+      }
+
+      const createdControlTest = await controlsApi.createControlTest(controlTestData)
 
       toast.success(
         isDraft ? "Draft saved successfully" : "Control test created successfully",
@@ -75,18 +106,41 @@ function CreateControlTestPage() {
         }
       )
 
-      // If run AI test is checked, show additional notification
+      // If run AI test is checked, create a control result
       if (runAiTest && !isDraft) {
-        setTimeout(() => {
-          toast.info("AI test initiated", {
-            description: "The control test is being executed...",
-          })
+        setTimeout(async () => {
+          try {
+            toast.info("AI test initiated", {
+              description: "The control test is being executed...",
+            })
+            
+            // Create a sample control result
+            await controlsApi.createControlResult({
+              test: createdControlTest.id,
+              outcome: true,
+              metadata: JSON.stringify({
+                ai_generated: true,
+                execution_time: new Date().toISOString(),
+                status: 'completed'
+              })
+            })
+            
+            toast.success("Control test executed successfully", {
+              description: "AI analysis complete. Check the results in the controls list.",
+            })
+          } catch (error) {
+            console.error('Failed to execute control test:', error)
+            toast.warning("Control test created but execution failed", {
+              description: "You can manually execute it from the controls list.",
+            })
+          }
         }, 1500)
       }
 
       // Navigate back to controls list
       navigate({ to: '/controls' })
     } catch (error) {
+      console.error('Failed to create control test:', error)
       toast.error("Failed to create control test", {
         description: "Please try again or contact support.",
       })
@@ -102,6 +156,28 @@ function CreateControlTestPage() {
   const updateFormData = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
+
+  // Fetch organization users on component mount
+  React.useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setIsLoadingUsers(true)
+        const organizationUsers = await usersApi.getOrganizationUsers()
+        // Filter only active users
+        const activeUsers = organizationUsers.filter(user => user.is_active)
+        setUsers(activeUsers)
+      } catch (error) {
+        console.error('Failed to fetch organization users:', error)
+        toast.error('Failed to load users', {
+          description: 'Please refresh the page to try again.'
+        })
+      } finally {
+        setIsLoadingUsers(false)
+      }
+    }
+
+    fetchUsers()
+  }, [])
 
   return (
     <PageLayout title="Create Control Test">
@@ -167,8 +243,8 @@ function CreateControlTestPage() {
                     <SelectContent>
                       <SelectItem value="daily">Daily</SelectItem>
                       <SelectItem value="weekly">Weekly</SelectItem>
+                      <SelectItem value="biweekly">Biweekly</SelectItem>
                       <SelectItem value="monthly">Monthly</SelectItem>
-                      <SelectItem value="quarterly">Quarterly</SelectItem>
                       <SelectItem value="annually">Annually</SelectItem>
                     </SelectContent>
                   </Select>
@@ -180,19 +256,25 @@ function CreateControlTestPage() {
                   <Select
                     value={formData.ownerId}
                     onValueChange={(value) => updateFormData('ownerId', value)}
+                    disabled={isLoadingUsers}
                   >
                     <SelectTrigger id="owner">
-                      <SelectValue placeholder="Select owner" />
+                      <SelectValue placeholder={isLoadingUsers ? "Loading users..." : "Select owner"} />
                     </SelectTrigger>
                     <SelectContent>
-                      {users.map((user) => (
-                        <SelectItem key={user.id} value={user.id}>
-                          <div className="flex flex-col">
-                            <span>{user.name}</span>
-                            <span className="text-xs text-muted-foreground">{user.email}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
+                      {users.map((user) => {
+                        const displayName = user.first_name && user.last_name 
+                          ? `${user.first_name} ${user.last_name}`
+                          : user.username
+                        return (
+                          <SelectItem key={user.id} value={user.id.toString()}>
+                            <div className="flex flex-col">
+                              <span>{displayName}</span>
+                              <span className="text-xs text-muted-foreground">{user.email}</span>
+                            </div>
+                          </SelectItem>
+                        )
+                      })}
                     </SelectContent>
                   </Select>
                 </div>

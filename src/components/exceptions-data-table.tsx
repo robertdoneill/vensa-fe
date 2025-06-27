@@ -29,32 +29,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { MoreHorizontal, Edit, Trash2, Eye, MessageSquare, Settings } from "lucide-react"
 
 interface Exception {
-  id: string
-  summary: string
-  controlTest: string
-  severity: string
-  status: string
-  assignedTo: string
-  dateIdentified: string
-  description: string
-  linkedEvidence: Array<{
-    name: string
-    type: string
-  }>
-  rootCause: string
-  comments: Array<{
+  id: number
+  test_details: {
     id: number
-    user: string
-    text: string
-    timestamp: string
-  }>
-  auditTrail: Array<{
-    action: string
-    user: string
-    date: string
-  }>
+    name: string
+  }
+  workpaper_details: {
+    id: number
+    title: string
+  }
+  created_at: string
+  updated_at: string
+  noteCount: number
+  remediationCount: number
+  status: 'open' | 'in_progress' | 'resolved'
+  severity?: string
+  assignedTo?: string
+  description?: string
 }
 
 interface ExceptionsDataTableProps {
@@ -102,28 +103,22 @@ const getSeverityBadge = (severity: string) => {
 
 const getStatusBadge = (status: string) => {
   switch (status) {
-    case "Open":
+    case "open":
       return (
         <Badge variant="outline" className="text-gray-600 border-gray-300">
           Open
         </Badge>
       )
-    case "In Progress":
+    case "in_progress":
       return (
         <Badge variant="default" className="bg-blue-100 text-blue-800 hover:bg-blue-100">
           In Progress
         </Badge>
       )
-    case "Resolved":
+    case "resolved":
       return (
         <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-100">
           Resolved
-        </Badge>
-      )
-    case "Escalated":
-      return (
-        <Badge variant="default" className="bg-purple-100 text-purple-800 hover:bg-purple-100">
-          Escalated
         </Badge>
       )
     default:
@@ -156,30 +151,32 @@ export function ExceptionsDataTable({ data, onRowClick }: ExceptionsDataTablePro
       accessorKey: "id",
       header: "ID",
       cell: ({ row }) => (
-        <span className="font-medium">{row.getValue("id")}</span>
+        <span className="font-medium">EXC-{row.getValue("id")}</span>
       ),
     },
     {
-      accessorKey: "summary",
-      header: "Summary",
-      cell: ({ row }) => (
-        <div className="max-w-md">
-          <div className="flex items-start space-x-2">
-            {getSeverityIcon(row.original.severity)}
-            <span className="text-sm font-medium truncate">{row.getValue("summary")}</span>
-          </div>
-        </div>
-      ),
-    },
-    {
-      accessorKey: "controlTest",
+      accessorKey: "test_details",
       header: "Control Test",
-      cell: ({ row }) => getControlTestBadge(row.getValue("controlTest")),
+      cell: ({ row }) => {
+        const testDetails = row.getValue("test_details") as Exception["test_details"]
+        return (
+          <div className="max-w-md">
+            <span className="text-sm font-medium truncate">{testDetails.name}</span>
+          </div>
+        )
+      },
     },
     {
-      accessorKey: "severity",
-      header: "Severity",
-      cell: ({ row }) => getSeverityBadge(row.getValue("severity")),
+      accessorKey: "workpaper_details",
+      header: "Workpaper",
+      cell: ({ row }) => {
+        const workpaperDetails = row.getValue("workpaper_details") as Exception["workpaper_details"]
+        return (
+          <Badge variant="outline">
+            {workpaperDetails.title}
+          </Badge>
+        )
+      },
     },
     {
       accessorKey: "status",
@@ -187,35 +184,87 @@ export function ExceptionsDataTable({ data, onRowClick }: ExceptionsDataTablePro
       cell: ({ row }) => getStatusBadge(row.getValue("status")),
     },
     {
-      accessorKey: "assignedTo",
-      header: "Assigned To",
+      accessorKey: "noteCount",
+      header: "Notes",
       cell: ({ row }) => (
-        <div className="flex items-center space-x-2">
-          <IconUser className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm">{row.getValue("assignedTo")}</span>
+        <div className="flex items-center space-x-1">
+          <IconLink className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm">{row.getValue("noteCount")}</span>
         </div>
       ),
     },
     {
-      accessorKey: "dateIdentified",
-      header: "Date Identified",
+      accessorKey: "remediationCount",
+      header: "Remediations",
+      cell: ({ row }) => (
+        <div className="flex items-center space-x-1">
+          <IconLink className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm">{row.getValue("remediationCount")}</span>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "created_at",
+      header: "Date Created",
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
           <IconCalendar className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">{row.getValue("dateIdentified")}</span>
+          <span className="text-sm text-muted-foreground">
+            {new Date(row.getValue("created_at")).toLocaleDateString()}
+          </span>
         </div>
       ),
     },
     {
-      id: "evidence",
-      header: "Evidence",
+      accessorKey: "updated_at",
+      header: "Last Updated",
+      cell: ({ row }) => (
+        <div className="flex items-center space-x-2">
+          <IconCalendar className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm text-muted-foreground">
+            {new Date(row.getValue("updated_at")).toLocaleDateString()}
+          </span>
+        </div>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Actions",
       cell: ({ row }) => {
-        const evidence = row.original.linkedEvidence
+        const exception = row.original
+        
         return (
-          <div className="flex items-center space-x-1">
-            <IconLink className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm">{evidence.length}</span>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+              <Button variant="ghost" size="icon">
+                <MoreHorizontal className="h-4 w-4" />
+                <span className="sr-only">Actions</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <Eye className="h-4 w-4 mr-2" />
+                View Details
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Manage Notes ({exception.noteCount})
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Settings className="h-4 w-4 mr-2" />
+                Manage Remediations ({exception.remediationCount})
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-destructive">
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )
       },
     },

@@ -6,33 +6,18 @@ import { PageLayout } from "@/components/page-layout"
 import { PageHeader } from "@/components/page-header"
 import { FilterBar } from "@/components/filter-bar"
 import { WorkpapersDataTable } from "@/components/workpapers-data-table"
-import { WorkpaperDetailDrawer } from "@/components/workpaper-detail-drawer"
 import { Button } from "@/components/ui/button"
 
-import workpapersData from "@/data/workpapers.json"
+import { workpapersApi, type Workpaper as BaseWorkpaper } from "@/lib/api/workpapers"
+import { toast } from "sonner"
 
-interface Workpaper {
-  id: string
-  title: string
-  controlTest: string
-  status: string
-  lastModified: string
+interface Workpaper extends BaseWorkpaper {
   evidenceCount: number
   createdBy: string
-  description: string
-  criteria: string
-  objective: string
-  aiFindings: Array<{
-    step: string
-    outcome: string
-    status: string
-  }>
-  comments: string
-  auditTrail: Array<{
-    action: string
-    user: string
-    date: string
-  }>
+  description?: string
+  criteria?: string
+  objective?: string
+  controlTest?: string
 }
 
 export const Route = createFileRoute('/workpapers')({
@@ -41,27 +26,107 @@ export const Route = createFileRoute('/workpapers')({
 
 function WorkpapersPage() {
   const navigate = useNavigate()
-  const [selectedWorkpaper, setSelectedWorkpaper] = React.useState<Workpaper | null>(null)
-  const [isDetailOpen, setIsDetailOpen] = React.useState(false)
-  const [filteredData, setFilteredData] = React.useState(workpapersData)
+  const [workpapers, setWorkpapers] = React.useState<Workpaper[]>([])
+  const [isLoading, setIsLoading] = React.useState(true)
+  const [filteredData, setFilteredData] = React.useState<Workpaper[]>([])
   const [searchQuery, setSearchQuery] = React.useState("")
   const [statusFilter, setStatusFilter] = React.useState("all")
-  const [testTypeFilter, setTestTypeFilter] = React.useState("all")
   const [createdByFilter, setCreatedByFilter] = React.useState("all")
 
+  // Load workpapers from API
+  React.useEffect(() => {
+    const loadWorkpapers = async () => {
+      try {
+        setIsLoading(true)
+        const apiWorkpapers = await workpapersApi.getWorkpapers()
+        
+        // Transform API data to match UI expectations
+        const transformedWorkpapers: Workpaper[] = apiWorkpapers.map((workpaper) => ({
+          ...workpaper,
+          evidenceCount: 0, // TODO: Get actual evidence count when evidence is linked to workpapers
+          createdBy: workpaper.organization.name, // Using organization as placeholder for creator
+          // Optional fields that might be added later
+          description: workpaper.description || '',
+          criteria: '',
+          objective: '',
+          controlTest: '',
+          // Add missing arrays to prevent map errors
+          aiFindings: [],
+          comments: '',
+          auditTrail: [
+            {
+              action: 'created workpaper',
+              user: workpaper.organization.name,
+              date: new Date(workpaper.created_at).toLocaleDateString()
+            }
+          ]
+        }))
+        
+        setWorkpapers(transformedWorkpapers)
+      } catch (error) {
+        console.error('Failed to load workpapers:', error)
+        toast.error('Failed to load workpapers')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadWorkpapers()
+  }, [])
+
   const handleRowClick = (workpaper: Workpaper) => {
-    setSelectedWorkpaper(workpaper)
-    setIsDetailOpen(true)
+    navigate({ to: `/workpapers/${workpaper.id}` })
+  }
+
+  const handleWorkpaperDeleted = () => {
+    // Refresh the workpapers list
+    const loadWorkpapers = async () => {
+      try {
+        setIsLoading(true)
+        const apiWorkpapers = await workpapersApi.getWorkpapers()
+        
+        // Transform API data to match UI expectations
+        const transformedWorkpapers: Workpaper[] = apiWorkpapers.map((workpaper) => ({
+          ...workpaper,
+          evidenceCount: 0, // TODO: Get actual evidence count when evidence is linked to workpapers
+          createdBy: workpaper.organization.name, // Using organization as placeholder for creator
+          // Optional fields that might be added later
+          description: workpaper.description || '',
+          criteria: '',
+          objective: '',
+          controlTest: '',
+          // Add missing arrays to prevent map errors
+          aiFindings: [],
+          comments: '',
+          auditTrail: [
+            {
+              action: 'created workpaper',
+              user: workpaper.organization.name,
+              date: new Date(workpaper.created_at).toLocaleDateString()
+            }
+          ]
+        }))
+        
+        setWorkpapers(transformedWorkpapers)
+      } catch (error) {
+        console.error('Failed to load workpapers:', error)
+        toast.error('Failed to refresh workpapers')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadWorkpapers()
   }
 
   React.useEffect(() => {
-    let filtered = workpapersData
+    let filtered = workpapers
 
     if (searchQuery) {
       filtered = filtered.filter(
         (workpaper) =>
           workpaper.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          workpaper.controlTest.toLowerCase().includes(searchQuery.toLowerCase())
+          (workpaper.controlTest && workpaper.controlTest.toLowerCase().includes(searchQuery.toLowerCase()))
       )
     }
 
@@ -69,18 +134,12 @@ function WorkpapersPage() {
       filtered = filtered.filter((workpaper) => workpaper.status === statusFilter)
     }
 
-    if (testTypeFilter !== "all") {
-      filtered = filtered.filter((workpaper) =>
-        workpaper.controlTest.toLowerCase().includes(testTypeFilter.toLowerCase())
-      )
-    }
-
     if (createdByFilter !== "all") {
       filtered = filtered.filter((workpaper) => workpaper.createdBy === createdByFilter)
     }
 
     setFilteredData(filtered)
-  }, [searchQuery, statusFilter, testTypeFilter, createdByFilter])
+  }, [workpapers, searchQuery, statusFilter, createdByFilter])
 
   const filterConfigs = [
     {
@@ -90,36 +149,24 @@ function WorkpapersPage() {
       onChange: setStatusFilter,
       options: [
         { value: "all", label: "All Statuses" },
-        { value: "Draft", label: "Draft" },
-        { value: "In Review", label: "In Review" },
-        { value: "Finalized", label: "Finalized" },
-      ],
-    },
-    {
-      id: "testType",
-      placeholder: "Test Type",
-      value: testTypeFilter,
-      onChange: setTestTypeFilter,
-      options: [
-        { value: "all", label: "All Types" },
-        { value: "uar", label: "UAR" },
-        { value: "3wm", label: "3WM" },
-        { value: "sox", label: "SOX" },
-        { value: "cm", label: "Change Mgmt" },
+        { value: "draft", label: "Draft" },
+        { value: "in_review", label: "In Review" },
+        { value: "finalized", label: "Finalized" },
+        // Add more status options based on your backend status values
       ],
     },
     {
       id: "createdBy",
-      placeholder: "Created By",
+      placeholder: "Organization",
       value: createdByFilter,
       onChange: setCreatedByFilter,
       options: [
-        { value: "all", label: "All Users" },
-        { value: "Jane Smith", label: "Jane Smith" },
-        { value: "Mike Johnson", label: "Mike Johnson" },
-        { value: "Sarah Davis", label: "Sarah Davis" },
-        { value: "Alex Chen", label: "Alex Chen" },
-        { value: "Lisa Wong", label: "Lisa Wong" },
+        { value: "all", label: "All Organizations" },
+        // Dynamically populated from actual workpaper organizations
+        ...Array.from(new Set(workpapers.map(w => w.createdBy))).map(org => ({
+          value: org,
+          label: org
+        }))
       ],
     },
   ]
@@ -146,14 +193,21 @@ function WorkpapersPage() {
       </div>
 
       <div className="px-4 lg:px-6">
-        <WorkpapersDataTable data={filteredData} onRowClick={handleRowClick} />
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading workpapers...</p>
+            </div>
+          </div>
+        ) : (
+          <WorkpapersDataTable 
+            data={filteredData} 
+            onRowClick={handleRowClick} 
+            onWorkpaperDeleted={handleWorkpaperDeleted}
+          />
+        )}
       </div>
-
-      <WorkpaperDetailDrawer
-        workpaper={selectedWorkpaper}
-        isOpen={isDetailOpen}
-        onClose={() => setIsDetailOpen(false)}
-      />
     </PageLayout>
   )
 }

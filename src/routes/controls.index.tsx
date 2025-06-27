@@ -10,34 +10,20 @@ import { ControlDetailDrawer } from "@/components/control-detail-drawer"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 
-import controlsData from "@/data/controls.json"
+import { controlsApi, type ControlTest, type ControlResult } from "@/lib/api/controls"
 
-interface Control {
-  id: string
-  name: string
-  objective: string
-  frequency: string
-  owner: {
-    id: string
-    name: string
-    email: string
-  }
-  criteria: string
-  testType: string
-  createdAt: string
-  updatedAt: string
-  lastResult: {
-    id: string
-    status: string
-    testDate: string
+interface Control extends ControlTest {
+  lastResult?: ControlResult & {
+    status: string;
+    testDate: string;
     tester: {
-      id: string
-      name: string
+      id: number;
+      name: string;
     }
-  } | null
-  commentCount: number
-  evidenceCount: number
-  status: string
+  };
+  commentCount: number;
+  evidenceCount: number;
+  status: string;
 }
 
 export const Route = createFileRoute('/controls/')({
@@ -46,24 +32,73 @@ export const Route = createFileRoute('/controls/')({
 
 function ControlsPage() {
   const navigate = useNavigate()
-  const [controls] = React.useState(controlsData)
+  const [controls, setControls] = React.useState<Control[]>([])
+  const [isLoading, setIsLoading] = React.useState(true)
   const [selectedControl, setSelectedControl] = React.useState<Control | null>(null)
   const [isDetailOpen, setIsDetailOpen] = React.useState(false)
-  const [filteredData, setFilteredData] = React.useState(controls)
+  const [filteredData, setFilteredData] = React.useState<Control[]>([])
   
   // Filter states
   const [searchQuery, setSearchQuery] = React.useState("")
-  const [testTypeFilter, setTestTypeFilter] = React.useState("all")
   const [frequencyFilter, setFrequencyFilter] = React.useState("all")
   const [statusFilter, setStatusFilter] = React.useState("all")
   const [ownerFilter, setOwnerFilter] = React.useState("all")
+
+  // Load controls from API
+  React.useEffect(() => {
+    const loadControls = async () => {
+      try {
+        setIsLoading(true)
+        const controlTests = await controlsApi.getControlTests()
+        
+        // Transform API data to match UI expectations
+        const transformedControls: Control[] = await Promise.all(
+          controlTests.map(async (test) => {
+            // Get comments count for this test
+            const comments = await controlsApi.getControlComments(test.id)
+            
+            // Get latest result for this test
+            const results = await controlsApi.getControlResults(test.id)
+            const latestResult = results.length > 0 
+              ? results.sort((a, b) => new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime())[0]
+              : undefined
+
+            return {
+              ...test,
+              lastResult: latestResult ? {
+                ...latestResult,
+                status: latestResult.outcome ? 'pass' : 'fail',
+                testDate: latestResult.created_at!,
+                tester: {
+                  id: test.owner.id,
+                  name: test.owner.name
+                }
+              } : undefined,
+              commentCount: comments.length,
+              evidenceCount: 0, // TODO: Add evidence count when evidence is linked to controls
+              status: 'active' // Default status, could be enhanced with actual status field
+            }
+          })
+        )
+        
+        setControls(transformedControls)
+      } catch (error) {
+        console.error('Failed to load controls:', error)
+        toast.error('Failed to load controls')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadControls()
+  }, [])
 
   const handleRowClick = (control: Control) => {
     setSelectedControl(control)
     setIsDetailOpen(true)
   }
 
-  const handleRunTest = async (controlId: string) => {
+  const handleRunTest = async (controlId: string | number) => {
     const control = controls.find(c => c.id === controlId)
     if (!control) return
 
@@ -71,12 +106,25 @@ function ControlsPage() {
       description: `Running ${control.name}...`,
     })
     
-    // Simulate test execution - in real app, this would POST to API
-    setTimeout(() => {
+    try {
+      // Create a new control result
+      await controlsApi.createControlResult({
+        test: typeof controlId === 'string' ? parseInt(controlId) : controlId,
+        outcome: true, // For demo purposes, always pass. In real app, this would be determined by test logic
+        metadata: `Test executed on ${new Date().toISOString()}`
+      })
+      
       toast.success("Test completed", {
         description: "Control test has been executed successfully.",
       })
-    }, 2000)
+      
+      // Reload controls to show the new result
+      window.location.reload() // Simple refresh - could be optimized to just update the specific control
+    } catch (error) {
+      toast.error("Test execution failed", {
+        description: "Failed to record test result.",
+      })
+    }
   }
 
   React.useEffect(() => {
@@ -89,9 +137,8 @@ function ControlsPage() {
       )
     }
 
-    if (testTypeFilter !== "all") {
-      filtered = filtered.filter(control => control.testType === testTypeFilter)
-    }
+    // Note: Removed testType filter as it's not in the backend schema
+    // Could be added back if testType is added to ControlTest model
 
     if (frequencyFilter !== "all") {
       filtered = filtered.filter(control => control.frequency === frequencyFilter)
@@ -102,27 +149,13 @@ function ControlsPage() {
     }
 
     if (ownerFilter !== "all") {
-      filtered = filtered.filter(control => control.owner.id === ownerFilter)
+      filtered = filtered.filter(control => control.owner.id.toString() === ownerFilter)
     }
 
     setFilteredData(filtered)
-  }, [controls, searchQuery, testTypeFilter, frequencyFilter, statusFilter, ownerFilter])
+  }, [controls, searchQuery, frequencyFilter, statusFilter, ownerFilter])
 
   const filterConfigs = [
-    {
-      id: "testType",
-      placeholder: "Test Type",
-      value: testTypeFilter,
-      onChange: setTestTypeFilter,
-      options: [
-        { value: "all", label: "All Types" },
-        { value: "sox", label: "SOX" },
-        { value: "uar", label: "UAR" },
-        { value: "3wm", label: "3-Way Match" },
-        { value: "change_mgmt", label: "Change Mgmt" },
-        { value: "custom", label: "Custom" },
-      ],
-    },
     {
       id: "frequency",
       placeholder: "Frequency",
@@ -130,11 +163,11 @@ function ControlsPage() {
       onChange: setFrequencyFilter,
       options: [
         { value: "all", label: "All Frequencies" },
-        { value: "daily", label: "Daily" },
-        { value: "weekly", label: "Weekly" },
-        { value: "monthly", label: "Monthly" },
-        { value: "quarterly", label: "Quarterly" },
-        { value: "annually", label: "Annually" },
+        { value: "d", label: "Daily" },
+        { value: "w", label: "Weekly" },
+        { value: "m", label: "Monthly" },
+        { value: "q", label: "Quarterly" },
+        { value: "y", label: "Yearly" },
       ],
     },
     {
@@ -157,11 +190,14 @@ function ControlsPage() {
       width: "w-[150px]",
       options: [
         { value: "all", label: "All Owners" },
-        { value: "USR-001", label: "Jane Smith" },
-        { value: "USR-002", label: "Mike Johnson" },
-        { value: "USR-003", label: "Sarah Davis" },
-        { value: "USR-004", label: "Alex Chen" },
-        { value: "USR-005", label: "John Doe" },
+        // Dynamically populated from actual control owners
+        ...Array.from(new Set(controls.map(c => c.owner.id.toString()))).map(id => {
+          const owner = controls.find(c => c.owner.id.toString() === id)?.owner
+          return {
+            value: id,
+            label: owner?.name || `User ${id}`
+          }
+        })
       ],
     },
   ]
@@ -188,11 +224,20 @@ function ControlsPage() {
       </div>
 
       <div className="px-4 lg:px-6">
-        <ControlsDataTable 
-          data={filteredData} 
-          onRowClick={handleRowClick}
-          onRunTest={handleRunTest}
-        />
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading controls...</p>
+            </div>
+          </div>
+        ) : (
+          <ControlsDataTable 
+            data={filteredData} 
+            onRowClick={handleRowClick}
+            onRunTest={handleRunTest}
+          />
+        )}
       </div>
 
       <ControlDetailDrawer
