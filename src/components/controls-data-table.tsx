@@ -15,10 +15,8 @@ import {
   IconCheck,
   IconX,
   IconAlertTriangle,
-  IconClock,
   IconMessageCircle,
   IconFiles,
-  IconTarget,
   IconCalendar,
 } from "@tabler/icons-react"
 
@@ -78,35 +76,10 @@ interface ControlsDataTableProps {
   data: Control[]
   onRowClick: (control: Control) => void
   onRunTest?: (controlId: string | number) => void
+  onDelete?: (controlId: number) => void
 }
 
-const getTestTypeIcon = (testType: string) => {
-  switch (testType) {
-    case "sox":
-      return <IconTarget className="h-4 w-4 text-red-600" />
-    case "uar":
-      return <IconCheck className="h-4 w-4 text-blue-600" />
-    case "3wm":
-      return <IconFiles className="h-4 w-4 text-green-600" />
-    case "change_mgmt":
-      return <IconClock className="h-4 w-4 text-purple-600" />
-    case "custom":
-      return <IconTarget className="h-4 w-4 text-orange-600" />
-    default:
-      return <IconTarget className="h-4 w-4 text-gray-600" />
-  }
-}
 
-const getTestTypeLabel = (testType: string) => {
-  const labels: Record<string, string> = {
-    sox: "SOX",
-    uar: "UAR",
-    "3wm": "3-Way Match",
-    change_mgmt: "Change Mgmt",
-    custom: "Custom",
-  }
-  return labels[testType] || testType
-}
 
 const getFrequencyBadge = (frequency: string) => {
   const colors: Record<string, string> = {
@@ -186,7 +159,7 @@ const getStatusBadge = (status: string) => {
   }
 }
 
-export function ControlsDataTable({ data, onRowClick, onRunTest }: ControlsDataTableProps) {
+export function ControlsDataTable({ data, onRowClick, onRunTest, onDelete }: ControlsDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
 
@@ -330,10 +303,18 @@ export function ControlsDataTable({ data, onRowClick, onRunTest }: ControlsDataT
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive">
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
-              </DropdownMenuItem>
+              {onDelete && (
+                <DropdownMenuItem 
+                  className="text-destructive"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onDelete(control.id)
+                  }}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )

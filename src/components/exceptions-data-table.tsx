@@ -11,10 +11,6 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table"
 import {
-  IconAlertCircle,
-  IconAlertTriangle,
-  IconInfoCircle,
-  IconUser,
   IconCalendar,
   IconLink,
 } from "@tabler/icons-react"
@@ -63,43 +59,7 @@ interface ExceptionsDataTableProps {
   onRowClick: (exception: Exception) => void
 }
 
-const getSeverityIcon = (severity: string) => {
-  switch (severity) {
-    case "High":
-      return <IconAlertCircle className="h-4 w-4 text-red-600" />
-    case "Medium":
-      return <IconAlertTriangle className="h-4 w-4 text-yellow-600" />
-    case "Low":
-      return <IconInfoCircle className="h-4 w-4 text-blue-600" />
-    default:
-      return <IconInfoCircle className="h-4 w-4 text-gray-600" />
-  }
-}
 
-const getSeverityBadge = (severity: string) => {
-  switch (severity) {
-    case "High":
-      return (
-        <Badge variant="destructive">
-          High
-        </Badge>
-      )
-    case "Medium":
-      return (
-        <Badge variant="default" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
-          Medium
-        </Badge>
-      )
-    case "Low":
-      return (
-        <Badge variant="secondary">
-          Low
-        </Badge>
-      )
-    default:
-      return <Badge variant="secondary">{severity}</Badge>
-  }
-}
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -126,21 +86,6 @@ const getStatusBadge = (status: string) => {
   }
 }
 
-const getControlTestBadge = (controlTest: string) => {
-  const type = controlTest.split('-')[0]
-  const colors: Record<string, string> = {
-    'SOX': 'bg-purple-100 text-purple-800',
-    'UAR': 'bg-blue-100 text-blue-800',
-    '3WM': 'bg-green-100 text-green-800',
-    'CM': 'bg-orange-100 text-orange-800',
-    'AP': 'bg-red-100 text-red-800',
-  }
-  return (
-    <Badge variant="outline" className={`${colors[type] || 'bg-gray-100 text-gray-800'} border-0`}>
-      {controlTest}
-    </Badge>
-  )
-}
 
 export function ExceptionsDataTable({ data, onRowClick }: ExceptionsDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])

@@ -21,7 +21,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 
-import workpaperData from "@/data/workpaper-generation.json"
 
 // Types aligned with backend
 interface WorkpaperSection {
@@ -51,14 +50,12 @@ function GenerateWorkpaperPage() {
   const [selectedControlTests, setSelectedControlTests] = React.useState<string[]>([])
   const [reviewerId, setReviewerId] = React.useState("")
   const [status, setStatus] = React.useState<'draft' | 'in_review' | 'finalized'>('draft')
+  const [users] = React.useState<any[]>([])
+  const [isLoading] = React.useState(false)
+  const [controlTests] = React.useState<any[]>([])
   
   // Workpaper sections
-  const [sections, setSections] = React.useState<WorkpaperSection[]>(
-    workpaperData.defaultSections.map(section => ({
-      ...section,
-      isExpanded: section.orderIndex === 0
-    } as WorkpaperSection))
-  )
+  const [sections, setSections] = React.useState<WorkpaperSection[]>([])
   
   const [reviewerNotes, setReviewerNotes] = React.useState("")
   const [exportFormat, setExportFormat] = React.useState("PDF")
@@ -163,18 +160,6 @@ function GenerateWorkpaperPage() {
     }
   }
 
-  const getTestResultBadge = (status: string) => {
-    switch (status) {
-      case "pass":
-        return "bg-green-100 text-green-800"
-      case "fail":
-        return "bg-red-100 text-red-800"
-      case "exception":
-        return "bg-yellow-100 text-yellow-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
-  }
 
   return (
     <PageLayout title="Generate Workpaper">
@@ -236,14 +221,19 @@ function GenerateWorkpaperPage() {
                       <SelectValue placeholder="Select reviewer" />
                     </SelectTrigger>
                     <SelectContent>
-                      {workpaperData.reviewers.map((reviewer: any) => (
-                        <SelectItem key={reviewer.id} value={reviewer.id}>
-                          <div className="flex flex-col">
-                            <span>{reviewer.name}</span>
-                            <span className="text-xs text-muted-foreground">{reviewer.role}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
+                      {users.map((user) => {
+                        const displayName = user.first_name && user.last_name 
+                          ? `${user.first_name} ${user.last_name}`
+                          : user.username
+                        return (
+                          <SelectItem key={user.id} value={user.id.toString()}>
+                            <div className="flex flex-col">
+                              <span>{displayName}</span>
+                              <span className="text-xs text-muted-foreground">{user.email}</span>
+                            </div>
+                          </SelectItem>
+                        )
+                      })}
                     </SelectContent>
                   </Select>
                 </div>

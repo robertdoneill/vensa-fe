@@ -20,7 +20,7 @@ interface Workpaper extends BaseWorkpaper {
   controlTest?: string
 }
 
-export const Route = createFileRoute('/workpapers')({
+export const Route = createFileRoute('/workpapers/')({
   component: WorkpapersPage,
 })
 

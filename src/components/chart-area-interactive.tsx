@@ -88,24 +88,6 @@ export function ChartAreaInteractive({ data: propData }: ChartAreaInteractivePro
     fetchActivityData()
   }, [propData])
 
-  const generateSampleData = (): ActivityData[] => {
-    const data: ActivityData[] = []
-    const today = new Date()
-    
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date(today)
-      date.setDate(date.getDate() - i)
-      
-      data.push({
-        date: date.toISOString().split('T')[0],
-        completed: Math.floor(Math.random() * 5),
-        exceptions: Math.floor(Math.random() * 3),
-        remediated: Math.floor(Math.random() * 2)
-      })
-    }
-    
-    return data
-  }
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)

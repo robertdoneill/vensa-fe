@@ -1,4 +1,3 @@
-import * as React from "react"
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
   IconArrowLeft,
@@ -14,7 +13,6 @@ import {
   IconTarget,
   IconReportAnalytics,
   IconEdit,
-  IconTrash,
 } from "@tabler/icons-react"
 
 import { PageLayout } from "@/components/page-layout"
@@ -31,7 +29,6 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { WorkpaperExportButton } from "@/components/workpaper-export-button"
-import { toast } from "sonner"
 
 import { workpapersApi, type Workpaper } from "@/lib/api/workpapers"
 

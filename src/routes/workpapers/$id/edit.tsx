@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
 
-import { workpapersApi, type Workpaper } from "@/lib/api/workpapers"
+import { workpapersApi } from "@/lib/api/workpapers"
 
 export const Route = createFileRoute('/workpapers/$id/edit')({
   component: EditWorkpaperPage,

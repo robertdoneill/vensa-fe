@@ -11,7 +11,8 @@ import { authService } from '@/lib/api/auth'
 
 // import auditData from "@/data/audit-data.json"
 
-// Real audit data from existing site
+// Real audit data from existing site - commented out as unused
+/*
 const auditData = {
   metrics: {
     activeControlTests: 45,
@@ -90,17 +91,8 @@ const auditData = {
     { date: "2024-01-15", completed: 2, exceptions: 1, remediated: 2 }
   ]
 }
+*/
 
-type AuditTest = {
-  id: string
-  controlName: string
-  type: string
-  status: "Draft" | "In Progress" | "Complete"
-  exceptions: number
-  assignedTo: string
-  lastUpdated: string
-  progress: number
-}
 
 export const Route = createFileRoute('/dashboard')({
   beforeLoad: () => {

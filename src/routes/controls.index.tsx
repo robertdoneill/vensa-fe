@@ -10,20 +10,15 @@ import { ControlDetailDrawer } from "@/components/control-detail-drawer"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 
-import { controlsApi, type ControlTest, type ControlResult } from "@/lib/api/controls"
+import { controlsApi, type ControlTest } from "@/lib/api/controls"
 
+// Extended interface with UI-specific fields
 interface Control extends ControlTest {
-  lastResult?: ControlResult & {
-    status: string;
-    testDate: string;
-    tester: {
-      id: number;
-      name: string;
-    }
-  };
-  commentCount: number;
-  evidenceCount: number;
-  status: string;
+  status?: string;
+  noteCount?: number;
+  evidenceCount?: number;
+  commentCount?: number;
+  lastResult?: any;
 }
 
 export const Route = createFileRoute('/controls/')({
@@ -127,6 +122,31 @@ function ControlsPage() {
     }
   }
 
+  const handleDeleteControl = async (controlId: number) => {
+    const control = controls.find(c => c.id === controlId)
+    if (!control) return
+
+    if (!confirm(`Are you sure you want to delete the control test "${control.name}"? This action cannot be undone.`)) {
+      return
+    }
+    
+    try {
+      await controlsApi.deleteControlTest(controlId)
+      
+      toast.success("Control test deleted", {
+        description: `"${control.name}" has been deleted successfully.`,
+      })
+      
+      // Remove the control from the local state
+      setControls(prevControls => prevControls.filter(c => c.id !== controlId))
+    } catch (error) {
+      console.error('Failed to delete control test:', error)
+      toast.error("Failed to delete control test", {
+        description: "Please try again or contact support.",
+      })
+    }
+  }
+
   React.useEffect(() => {
     let filtered = controls
 
@@ -145,7 +165,7 @@ function ControlsPage() {
     }
 
     if (statusFilter !== "all") {
-      filtered = filtered.filter(control => control.status === statusFilter)
+      filtered = filtered.filter(control => (control.status || 'draft') === statusFilter)
     }
 
     if (ownerFilter !== "all") {
@@ -209,7 +229,7 @@ function ControlsPage() {
         actions={
           <Button onClick={() => navigate({ to: '/controls/create' })}>
             <IconPlus className="h-4 w-4 mr-2" />
-            Create Control
+            Create Control Test
           </Button>
         }
       />
@@ -233,15 +253,16 @@ function ControlsPage() {
           </div>
         ) : (
           <ControlsDataTable 
-            data={filteredData} 
-            onRowClick={handleRowClick}
+            data={filteredData as any} 
+            onRowClick={handleRowClick as any}
             onRunTest={handleRunTest}
+            onDelete={handleDeleteControl}
           />
         )}
       </div>
 
       <ControlDetailDrawer
-        control={selectedControl}
+        control={selectedControl as any}
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
       />

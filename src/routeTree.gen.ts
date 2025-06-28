@@ -9,32 +9,23 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WorkpapersRouteImport } from './routes/workpapers'
-import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ExceptionsRouteImport } from './routes/exceptions'
 import { Route as EvidenceRouteImport } from './routes/evidence'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CuecMappingRouteImport } from './routes/cuec-mapping'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorkpapersIndexRouteImport } from './routes/workpapers/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as ControlsIndexRouteImport } from './routes/controls.index'
 import { Route as WorkpapersGenerateRouteImport } from './routes/workpapers/generate'
 import { Route as WorkpapersIdRouteImport } from './routes/workpapers/$id'
+import { Route as InviteAcceptRouteImport } from './routes/invite/accept'
 import { Route as ControlsLayoutRouteImport } from './routes/controls.layout'
 import { Route as ControlsCreateRouteImport } from './routes/controls/create'
 import { Route as WorkpapersReportsIdRouteImport } from './routes/workpapers/reports/$id'
 import { Route as WorkpapersIdEditRouteImport } from './routes/workpapers/$id/edit'
 
-const WorkpapersRoute = WorkpapersRouteImport.update({
-  id: '/workpapers',
-  path: '/workpapers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -65,20 +56,35 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkpapersIndexRoute = WorkpapersIndexRouteImport.update({
+  id: '/workpapers/',
+  path: '/workpapers/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ControlsIndexRoute = ControlsIndexRouteImport.update({
   id: '/controls/',
   path: '/controls/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WorkpapersGenerateRoute = WorkpapersGenerateRouteImport.update({
-  id: '/generate',
-  path: '/generate',
-  getParentRoute: () => WorkpapersRoute,
+  id: '/workpapers/generate',
+  path: '/workpapers/generate',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const WorkpapersIdRoute = WorkpapersIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => WorkpapersRoute,
+  id: '/workpapers/$id',
+  path: '/workpapers/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InviteAcceptRoute = InviteAcceptRouteImport.update({
+  id: '/invite/accept',
+  path: '/invite/accept',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ControlsLayoutRoute = ControlsLayoutRouteImport.update({
   id: '/controls/layout',
@@ -91,9 +97,9 @@ const ControlsCreateRoute = ControlsCreateRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const WorkpapersReportsIdRoute = WorkpapersReportsIdRouteImport.update({
-  id: '/reports/$id',
-  path: '/reports/$id',
-  getParentRoute: () => WorkpapersRoute,
+  id: '/workpapers/reports/$id',
+  path: '/workpapers/reports/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const WorkpapersIdEditRoute = WorkpapersIdEditRouteImport.update({
   id: '/edit',
@@ -108,13 +114,14 @@ export interface FileRoutesByFullPath {
   '/evidence': typeof EvidenceRoute
   '/exceptions': typeof ExceptionsRoute
   '/login': typeof LoginRoute
-  '/settings': typeof SettingsRoute
-  '/workpapers': typeof WorkpapersRouteWithChildren
   '/controls/create': typeof ControlsCreateRoute
   '/controls/layout': typeof ControlsLayoutRoute
+  '/invite/accept': typeof InviteAcceptRoute
   '/workpapers/$id': typeof WorkpapersIdRouteWithChildren
   '/workpapers/generate': typeof WorkpapersGenerateRoute
   '/controls': typeof ControlsIndexRoute
+  '/settings': typeof SettingsIndexRoute
+  '/workpapers': typeof WorkpapersIndexRoute
   '/workpapers/$id/edit': typeof WorkpapersIdEditRoute
   '/workpapers/reports/$id': typeof WorkpapersReportsIdRoute
 }
@@ -125,13 +132,14 @@ export interface FileRoutesByTo {
   '/evidence': typeof EvidenceRoute
   '/exceptions': typeof ExceptionsRoute
   '/login': typeof LoginRoute
-  '/settings': typeof SettingsRoute
-  '/workpapers': typeof WorkpapersRouteWithChildren
   '/controls/create': typeof ControlsCreateRoute
   '/controls/layout': typeof ControlsLayoutRoute
+  '/invite/accept': typeof InviteAcceptRoute
   '/workpapers/$id': typeof WorkpapersIdRouteWithChildren
   '/workpapers/generate': typeof WorkpapersGenerateRoute
   '/controls': typeof ControlsIndexRoute
+  '/settings': typeof SettingsIndexRoute
+  '/workpapers': typeof WorkpapersIndexRoute
   '/workpapers/$id/edit': typeof WorkpapersIdEditRoute
   '/workpapers/reports/$id': typeof WorkpapersReportsIdRoute
 }
@@ -143,13 +151,14 @@ export interface FileRoutesById {
   '/evidence': typeof EvidenceRoute
   '/exceptions': typeof ExceptionsRoute
   '/login': typeof LoginRoute
-  '/settings': typeof SettingsRoute
-  '/workpapers': typeof WorkpapersRouteWithChildren
   '/controls/create': typeof ControlsCreateRoute
   '/controls/layout': typeof ControlsLayoutRoute
+  '/invite/accept': typeof InviteAcceptRoute
   '/workpapers/$id': typeof WorkpapersIdRouteWithChildren
   '/workpapers/generate': typeof WorkpapersGenerateRoute
   '/controls/': typeof ControlsIndexRoute
+  '/settings/': typeof SettingsIndexRoute
+  '/workpapers/': typeof WorkpapersIndexRoute
   '/workpapers/$id/edit': typeof WorkpapersIdEditRoute
   '/workpapers/reports/$id': typeof WorkpapersReportsIdRoute
 }
@@ -162,13 +171,14 @@ export interface FileRouteTypes {
     | '/evidence'
     | '/exceptions'
     | '/login'
-    | '/settings'
-    | '/workpapers'
     | '/controls/create'
     | '/controls/layout'
+    | '/invite/accept'
     | '/workpapers/$id'
     | '/workpapers/generate'
     | '/controls'
+    | '/settings'
+    | '/workpapers'
     | '/workpapers/$id/edit'
     | '/workpapers/reports/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -179,13 +189,14 @@ export interface FileRouteTypes {
     | '/evidence'
     | '/exceptions'
     | '/login'
-    | '/settings'
-    | '/workpapers'
     | '/controls/create'
     | '/controls/layout'
+    | '/invite/accept'
     | '/workpapers/$id'
     | '/workpapers/generate'
     | '/controls'
+    | '/settings'
+    | '/workpapers'
     | '/workpapers/$id/edit'
     | '/workpapers/reports/$id'
   id:
@@ -196,13 +207,14 @@ export interface FileRouteTypes {
     | '/evidence'
     | '/exceptions'
     | '/login'
-    | '/settings'
-    | '/workpapers'
     | '/controls/create'
     | '/controls/layout'
+    | '/invite/accept'
     | '/workpapers/$id'
     | '/workpapers/generate'
     | '/controls/'
+    | '/settings/'
+    | '/workpapers/'
     | '/workpapers/$id/edit'
     | '/workpapers/reports/$id'
   fileRoutesById: FileRoutesById
@@ -214,29 +226,19 @@ export interface RootRouteChildren {
   EvidenceRoute: typeof EvidenceRoute
   ExceptionsRoute: typeof ExceptionsRoute
   LoginRoute: typeof LoginRoute
-  SettingsRoute: typeof SettingsRoute
-  WorkpapersRoute: typeof WorkpapersRouteWithChildren
   ControlsCreateRoute: typeof ControlsCreateRoute
   ControlsLayoutRoute: typeof ControlsLayoutRoute
+  InviteAcceptRoute: typeof InviteAcceptRoute
+  WorkpapersIdRoute: typeof WorkpapersIdRouteWithChildren
+  WorkpapersGenerateRoute: typeof WorkpapersGenerateRoute
   ControlsIndexRoute: typeof ControlsIndexRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
+  WorkpapersIndexRoute: typeof WorkpapersIndexRoute
+  WorkpapersReportsIdRoute: typeof WorkpapersReportsIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/workpapers': {
-      id: '/workpapers'
-      path: '/workpapers'
-      fullPath: '/workpapers'
-      preLoaderRoute: typeof WorkpapersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -279,6 +281,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/workpapers/': {
+      id: '/workpapers/'
+      path: '/workpapers'
+      fullPath: '/workpapers'
+      preLoaderRoute: typeof WorkpapersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/': {
+      id: '/settings/'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/controls/': {
       id: '/controls/'
       path: '/controls'
@@ -288,17 +304,24 @@ declare module '@tanstack/react-router' {
     }
     '/workpapers/generate': {
       id: '/workpapers/generate'
-      path: '/generate'
+      path: '/workpapers/generate'
       fullPath: '/workpapers/generate'
       preLoaderRoute: typeof WorkpapersGenerateRouteImport
-      parentRoute: typeof WorkpapersRoute
+      parentRoute: typeof rootRouteImport
     }
     '/workpapers/$id': {
       id: '/workpapers/$id'
-      path: '/$id'
+      path: '/workpapers/$id'
       fullPath: '/workpapers/$id'
       preLoaderRoute: typeof WorkpapersIdRouteImport
-      parentRoute: typeof WorkpapersRoute
+      parentRoute: typeof rootRouteImport
+    }
+    '/invite/accept': {
+      id: '/invite/accept'
+      path: '/invite/accept'
+      fullPath: '/invite/accept'
+      preLoaderRoute: typeof InviteAcceptRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/controls/layout': {
       id: '/controls/layout'
@@ -316,10 +339,10 @@ declare module '@tanstack/react-router' {
     }
     '/workpapers/reports/$id': {
       id: '/workpapers/reports/$id'
-      path: '/reports/$id'
+      path: '/workpapers/reports/$id'
       fullPath: '/workpapers/reports/$id'
       preLoaderRoute: typeof WorkpapersReportsIdRouteImport
-      parentRoute: typeof WorkpapersRoute
+      parentRoute: typeof rootRouteImport
     }
     '/workpapers/$id/edit': {
       id: '/workpapers/$id/edit'
@@ -343,22 +366,6 @@ const WorkpapersIdRouteWithChildren = WorkpapersIdRoute._addFileChildren(
   WorkpapersIdRouteChildren,
 )
 
-interface WorkpapersRouteChildren {
-  WorkpapersIdRoute: typeof WorkpapersIdRouteWithChildren
-  WorkpapersGenerateRoute: typeof WorkpapersGenerateRoute
-  WorkpapersReportsIdRoute: typeof WorkpapersReportsIdRoute
-}
-
-const WorkpapersRouteChildren: WorkpapersRouteChildren = {
-  WorkpapersIdRoute: WorkpapersIdRouteWithChildren,
-  WorkpapersGenerateRoute: WorkpapersGenerateRoute,
-  WorkpapersReportsIdRoute: WorkpapersReportsIdRoute,
-}
-
-const WorkpapersRouteWithChildren = WorkpapersRoute._addFileChildren(
-  WorkpapersRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CuecMappingRoute: CuecMappingRoute,
@@ -366,11 +373,15 @@ const rootRouteChildren: RootRouteChildren = {
   EvidenceRoute: EvidenceRoute,
   ExceptionsRoute: ExceptionsRoute,
   LoginRoute: LoginRoute,
-  SettingsRoute: SettingsRoute,
-  WorkpapersRoute: WorkpapersRouteWithChildren,
   ControlsCreateRoute: ControlsCreateRoute,
   ControlsLayoutRoute: ControlsLayoutRoute,
+  InviteAcceptRoute: InviteAcceptRoute,
+  WorkpapersIdRoute: WorkpapersIdRouteWithChildren,
+  WorkpapersGenerateRoute: WorkpapersGenerateRoute,
   ControlsIndexRoute: ControlsIndexRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
+  WorkpapersIndexRoute: WorkpapersIndexRoute,
+  WorkpapersReportsIdRoute: WorkpapersReportsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -28,7 +28,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Progress } from "@/components/ui/progress"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -105,21 +104,6 @@ const getStatusBadge = (status: string) => {
   }
 }
 
-const getTestTypeBadge = (controlTest: string) => {
-  const type = controlTest.split('-')[0]
-  const colors: Record<string, string> = {
-    'SOX': 'bg-purple-100 text-purple-800',
-    'UAR': 'bg-blue-100 text-blue-800',
-    '3WM': 'bg-green-100 text-green-800',
-    'CM': 'bg-orange-100 text-orange-800',
-    'FC': 'bg-red-100 text-red-800',
-  }
-  return (
-    <Badge variant="outline" className={`${colors[type] || 'bg-gray-100 text-gray-800'} border-0`}>
-      {type}
-    </Badge>
-  )
-}
 
 const formatDateRange = (startDate: string, endDate: string) => {
   const start = new Date(startDate).toLocaleDateString()

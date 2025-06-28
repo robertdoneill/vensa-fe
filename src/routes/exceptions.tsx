@@ -12,13 +12,14 @@ import { Button } from "@/components/ui/button"
 import { exceptionsApi, type Exception as BaseException } from "@/lib/api/exceptions"
 import { toast } from "sonner"
 
+// Extended interface with UI-specific fields
 interface Exception extends BaseException {
-  noteCount: number
-  remediationCount: number
-  status: 'open' | 'in_progress' | 'resolved'
-  severity?: string
-  assignedTo?: string
-  description?: string
+  status?: 'open' | 'in_progress' | 'resolved';
+  noteCount?: number;
+  remediationCount?: number;
+  severity?: string;
+  assignedTo?: string;
+  description?: string;
 }
 
 export const Route = createFileRoute('/exceptions')({
@@ -44,10 +45,10 @@ function ExceptionsPage() {
         setIsLoading(true)
         const apiExceptions = await exceptionsApi.getExceptionsWithCounts()
         
-        // Transform API data to match UI expectations
+        // The API already returns the data with counts and status, just add optional UI fields
         const transformedExceptions: Exception[] = apiExceptions.map((exception) => ({
           ...exception,
-          // Optional fields that might be added later
+          // Add optional UI fields that might be added later
           severity: undefined,
           assignedTo: undefined,
           description: undefined
@@ -191,12 +192,12 @@ function ExceptionsPage() {
             </div>
           </div>
         ) : (
-          <ExceptionsDataTable data={filteredData} onRowClick={handleRowClick} />
+          <ExceptionsDataTable data={filteredData as any} onRowClick={handleRowClick as any} />
         )}
       </div>
 
       <ExceptionDetailDrawer
-        exception={selectedException}
+        exception={selectedException as any}
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
       />

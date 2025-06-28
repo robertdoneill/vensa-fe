@@ -9,22 +9,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
-import { usersApi, type OrganizationUser } from "@/lib/api/users"
 import { controlsApi } from "@/lib/api/controls"
 import { workpapersApi } from "@/lib/api/workpapers"
 
 interface FormData {
   name: string
-  testType: string
   objective: string
   description: string
-  frequency: string
-  ownerId: string
   criteria: string
-  successConditions: string
 }
 
 export const Route = createFileRoute('/controls/create')({
@@ -36,26 +30,20 @@ function CreateControlTestPage() {
   
   const [formData, setFormData] = React.useState<FormData>({
     name: "",
-    testType: "",
     objective: "",
     description: "",
-    frequency: "",
-    ownerId: "",
     criteria: "",
-    successConditions: "",
   })
   
   const [runAiTest, setRunAiTest] = React.useState(false)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const [users, setUsers] = React.useState<OrganizationUser[]>([])
-  const [isLoadingUsers, setIsLoadingUsers] = React.useState(true)
 
   const handleSubmit = async (isDraft = false) => {
     setIsSubmitting(true)
     
     try {
       // Validate required fields
-      if (!isDraft && (!formData.name || !formData.testType || !formData.objective || !formData.ownerId || !formData.frequency)) {
+      if (!isDraft && (!formData.name || !formData.objective)) {
         toast.error("Please fill in all required fields")
         setIsSubmitting(false)
         return
@@ -79,21 +67,12 @@ function CreateControlTestPage() {
 
       const createdWorkpaper = await workpapersApi.createWorkpaper(workpaperData)
 
-      // Map frequency values to backend format
-      const frequencyMap: Record<string, 'd' | 'w' | 'b' | 'm' | 'y'> = {
-        'daily': 'd',
-        'weekly': 'w',
-        'biweekly': 'b', 
-        'monthly': 'm',
-        'annually': 'y'
-      }
-
       // Create control test via API
       const controlTestData = {
         workpaper: createdWorkpaper.id,
         name: formData.name,
         objective: formData.objective,
-        frequency: frequencyMap[formData.frequency] || 'm',
+        frequency: 'y' as const,
         criteria: formData.criteria || 'No specific criteria defined'
       }
 
@@ -157,27 +136,6 @@ function CreateControlTestPage() {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  // Fetch organization users on component mount
-  React.useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setIsLoadingUsers(true)
-        const organizationUsers = await usersApi.getOrganizationUsers()
-        // Filter only active users
-        const activeUsers = organizationUsers.filter(user => user.is_active)
-        setUsers(activeUsers)
-      } catch (error) {
-        console.error('Failed to fetch organization users:', error)
-        toast.error('Failed to load users', {
-          description: 'Please refresh the page to try again.'
-        })
-      } finally {
-        setIsLoadingUsers(false)
-      }
-    }
-
-    fetchUsers()
-  }, [])
 
   return (
     <PageLayout title="Create Control Test">
@@ -194,91 +152,18 @@ function CreateControlTestPage() {
               <CardDescription>Core details about the control test</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="name">
-                    Control Test Name <span className="text-destructive">*</span>
-                  </Label>
-                  <Input 
-                    id="name" 
-                    placeholder="e.g., SOX-404-Revenue Recognition"
-                    value={formData.name}
-                    onChange={(e) => updateFormData('name', e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="test-type">
-                    Test Type <span className="text-destructive">*</span>
-                  </Label>
-                  <Select
-                    value={formData.testType}
-                    onValueChange={(value) => updateFormData('testType', value)}
-                  >
-                    <SelectTrigger id="test-type">
-                      <SelectValue placeholder="Select test type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="uar">UAR (User Access Review)</SelectItem>
-                      <SelectItem value="3wm">3-Way Match</SelectItem>
-                      <SelectItem value="change_mgmt">Change Management</SelectItem>
-                      <SelectItem value="sox">SOX Control</SelectItem>
-                      <SelectItem value="custom">Custom</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="name">
+                  Control Test Name <span className="text-destructive">*</span>
+                </Label>
+                <Input 
+                  id="name" 
+                  placeholder="e.g., SOX-404-Revenue Recognition"
+                  value={formData.name}
+                  onChange={(e) => updateFormData('name', e.target.value)}
+                />
               </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="frequency">
-                    Test Frequency <span className="text-destructive">*</span>
-                  </Label>
-                  <Select
-                    value={formData.frequency}
-                    onValueChange={(value) => updateFormData('frequency', value)}
-                  >
-                    <SelectTrigger id="frequency">
-                      <SelectValue placeholder="How often to run" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="daily">Daily</SelectItem>
-                      <SelectItem value="weekly">Weekly</SelectItem>
-                      <SelectItem value="biweekly">Biweekly</SelectItem>
-                      <SelectItem value="monthly">Monthly</SelectItem>
-                      <SelectItem value="annually">Annually</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="owner">
-                    Control Owner <span className="text-destructive">*</span>
-                  </Label>
-                  <Select
-                    value={formData.ownerId}
-                    onValueChange={(value) => updateFormData('ownerId', value)}
-                    disabled={isLoadingUsers}
-                  >
-                    <SelectTrigger id="owner">
-                      <SelectValue placeholder={isLoadingUsers ? "Loading users..." : "Select owner"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {users.map((user) => {
-                        const displayName = user.first_name && user.last_name 
-                          ? `${user.first_name} ${user.last_name}`
-                          : user.username
-                        return (
-                          <SelectItem key={user.id} value={user.id.toString()}>
-                            <div className="flex flex-col">
-                              <span>{displayName}</span>
-                              <span className="text-xs text-muted-foreground">{user.email}</span>
-                            </div>
-                          </SelectItem>
-                        )
-                      })}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="objective">
@@ -326,16 +211,6 @@ function CreateControlTestPage() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="success-conditions">Success Conditions</Label>
-                <Textarea
-                  id="success-conditions"
-                  placeholder="Define specific success metrics (e.g., 100% of samples must have approval documentation)"
-                  className="min-h-[100px] resize-none"
-                  value={formData.successConditions}
-                  onChange={(e) => updateFormData('successConditions', e.target.value)}
-                />
-              </div>
             </CardContent>
           </Card>
 

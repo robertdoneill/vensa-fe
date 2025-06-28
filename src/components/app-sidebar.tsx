@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/lib/auth/auth-context"
 
-const getNavigationData = (user: any) => ({
+const getNavigationData = () => ({
   navMain: [
     {
       title: "Dashboard",
@@ -184,7 +184,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
   }, [user, isAuthenticated])
 
-  const data = getNavigationData(userData)
+  const data = getNavigationData()
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>

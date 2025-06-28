@@ -12,7 +12,6 @@ import {
 } from "@tanstack/react-table"
 import {
   IconFileText,
-  IconUser,
   IconCalendar,
   IconCheck,
   IconClock,
@@ -128,7 +127,7 @@ export function AuditDataTable({ data: propData }: AuditDataTableProps) {
         // Transform data to match expected format
         const transformedData: AuditTest[] = [
           // Add control tests
-          ...controls.slice(0, 5).map((control, index) => {
+          ...controls.slice(0, 5).map((control) => {
             const relatedExceptions = exceptions.filter(e => e.test_details.id === control.id)
             const relatedWorkpaper = workpapers.find(w => w.id === control.workpaper_details.id)
             
@@ -160,7 +159,7 @@ export function AuditDataTable({ data: propData }: AuditDataTableProps) {
             }
           }),
           // Add workpapers as audit tests
-          ...workpapers.slice(0, 3).map((workpaper, index) => {
+          ...workpapers.slice(0, 3).map((workpaper) => {
             const relatedExceptions = exceptions.filter(e => e.workpaper_details.id === workpaper.id)
             
             let status: "Draft" | "In Progress" | "Complete" = "Draft"
@@ -213,18 +212,6 @@ export function AuditDataTable({ data: propData }: AuditDataTableProps) {
     return 'CTRL'
   }
 
-  const generateSampleData = (): AuditTest[] => [
-    {
-      id: "SAMPLE-001",
-      controlName: "Sample Control Test",
-      type: "UAR",
-      status: "In Progress",
-      exceptions: 1,
-      assignedTo: "System User",
-      lastUpdated: new Date().toLocaleDateString(),
-      progress: 50
-    }
-  ]
 
   const handleRowClick = (auditTest: AuditTest) => {
     // Navigate based on the type of test
